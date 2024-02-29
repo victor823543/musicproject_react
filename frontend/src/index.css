@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .checkbox-label {
+        @apply flex items-center gap-1 py-1 px-2 border-2 border-teal-600 shadow-sm shadow-teal-500/30 
+    }
+    
+}
+
+@layer utilities {
+    .btn-s {
+        @apply bg-teal-700/10 py-2 px-4 font-light border-2 border-teal-600 rounded-md hover:bg-zinc-600/20
+    }
+}
