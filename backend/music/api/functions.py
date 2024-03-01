@@ -9,7 +9,7 @@ import tempfile
 import random
 import copy
 
-Soundfonts = ['api/static/soundfonts/NY_Steinway_Model_D.sf2', 'api/static/soundfonts/Yamaha_C7__Normalized_.sf2', 'api/static/soundfonts/Chateau Grand-v2.2.sf2']
+Soundfonts = ['api/static/soundfonts/NY_Steinway_Model_D.sf2']
 SOUNDFONT = Soundfonts[0]
 
 #Functions for creating a new song

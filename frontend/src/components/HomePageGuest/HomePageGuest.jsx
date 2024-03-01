@@ -69,23 +69,23 @@ const HomePageGuest = (props) => {
             </div>    
                 
                 {showLoginPage && 
-                    <div  className={`flex flex-col justify-center items-center gap-4 h-full mt-16 text-black`}>
+                    <div  className={`flex flex-col justify-center items-center gap-4 h-full mt-16 text-black text-center`}>
                         {showLogin && props.children[0]}
                         {showSignup && props.children[1]}
                         {showLogin ? (
                             <>
                             <p className=' font-montserrat font-light'>Not yet an account?</p>
-                            <button className='bg-zinc-200 ring-2 ring-zinc-500 py-2 px-4 rounded-md text-black text-lg font-montserrat font-light' onClick={handleCreateClick}>Create Account</button>
+                            <button className='btn-w' onClick={handleCreateClick}>Create Account</button>
                             </>
                         ) : (
                             <>
                             <p className=' font-montserrat font-light'>Already have an account?</p>
-                            <button className='bg-zinc-200 ring-2 ring-zinc-500 py-2 px-4 rounded-md text-black text-lg font-montserrat font-light' onClick={handleLoginClick}>Log in</button>
+                            <button className='btn-w' onClick={handleLoginClick}>Log in</button>
                             </>
                         )}
                         
                         <p className=' font-montserrat font-light'>Just want to test out the site?</p>
-                        <button className='bg-zinc-200 ring-2 ring-zinc-500 py-2 px-4 rounded-md text-black text-lg font-montserrat font-light' onClick={handleGuestClick}>Continue as Guest</button>
+                        <button className='btn-w' onClick={handleGuestClick}>Continue as Guest</button>
                     </div>
                 }
                 

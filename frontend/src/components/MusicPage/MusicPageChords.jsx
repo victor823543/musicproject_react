@@ -13,7 +13,7 @@ const MusicPageChords = (props) => {
                 const border = 'border-l-2 border-teal-600'
                 
                 return (
-                    <li key={key} className={`max-xsPlus:text-2xl text-3xl font-light hover:text-teal-600 w-full ${(index > 0 && border)} text-center py-2`} onClick={() => props.handleChordClick(chord['name'])} style={(props.chordPlaying === index + (props.verseIndex * 4)) ? {color: clickedColor, fontWeight: 700, fontSize: '34px'} : {backgroundColor: null}} >
+                    <li key={key} className={`max-xs:text-lg max-xsPlus:text-2xl text-3xl font-light hover:text-teal-600 w-full ${(index > 0 && border)} text-center py-2`} onClick={() => props.handleChordClick(chord['name'])} style={(props.chordPlaying === index + (props.verseIndex * 4)) ? {color: clickedColor, fontWeight: 700, fontSize: '34px'} : {backgroundColor: null}} >
                         {chord['name']}
                     </li>
                 )

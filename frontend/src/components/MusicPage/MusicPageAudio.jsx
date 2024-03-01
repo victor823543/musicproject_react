@@ -64,29 +64,29 @@ const MusicPageAudio = (props) => {
                             <label className='text-2xl font-light text-nowrap' htmlFor="tempoInput">{`Tempo (${clickedOption.tempo})`}</label>
                             <input className='range-input bg-transparent' value={clickedOption.tempo} onChange={handleTempoChange} id='tempoInput' type="range" min={1} max={4}/>
                         </form>
-                        <div className='flex flex-wrap gap-4'>
+                        <div className='flex flex-wrap gap-4 max-xs:text-base text-xl'>
                             {options.map((option, index) => 
                                 <div onClick={() => handleOptionClick(index, 0)} style={
                                     (currentOption.chords === index) ? {backgroundColor: currentColor} : (clickedOption.chords === index) ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
                                 } 
-                                className='font-light text-xl py-2 px-4 bg-slate-900 rounded-sm' key={index}>
+                                className='font-light py-2 px-4 bg-slate-900 rounded-sm' key={index}>
                                     {option}
                                 </div>
                             )}
                         </div>
-                        <div className='flex flex-wrap gap-4'> 
+                        <div className='flex flex-wrap gap-4 max-xs:text-base text-xl'> 
                             {baseOptions.map((option, index) => 
                                 <div onClick={() => handleOptionClick(index, 1)} style={
                                     (currentOption.base === index) ? {backgroundColor: currentColor} : (clickedOption.base === index) ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
                                 }
-                                className='font-light text-xl py-2 px-4 bg-slate-900 rounded-sm' key={index}>
+                                className='font-light py-2 px-4 bg-slate-900 rounded-sm' key={index}>
                                     {option}
                                 </div>
                             )}
                         </div>
                     </div>
                 }
-                {props.audio && (
+                {(props.audio && !props.inModal) && (
                     <div className='mt-4'>
                         <ReactPlayer
                             url={props.audio}
@@ -100,12 +100,12 @@ const MusicPageAudio = (props) => {
                     
                 )}
             </div>
-            {props.audio && (
-                <div className='mt-4'>
+            {(props.audio && !props.inModal) && (
+                <div className='mt-4 overflow-clip sm:hidden'>
                     <ReactPlayer
                         url={props.audio}
                         controls
-                        width={'300px'}
+                        width={'260px'}
                         height={'50px'}
                         progressInterval={500}
                         onProgress={props.handleProgress}

@@ -91,20 +91,28 @@ def transpose(request):
         transposed_song = {}
         transposed_chords = {}
         chords_list = {}
+        ordered_chord_list = []
         interval = intervals.determine(data['oldKey'], data['key'], True)
 
         #Create transposed song
         for verse_key, verse in data['song'].items():
             new_verse = {}
+
             for chord_key, chord in verse.items():
+                #Transpose chord according to given interval
                 new_root = intervals.from_shorthand(chord['root'], interval)
                 new_addition = chord['addition']
                 new_name = new_root + new_addition
                 new_chord = chords.from_shorthand(new_name)
 
+                #Add chord to ordered chord list
+                ordered_chord_list.append(new_name)
+
+                #Add chord to chord list if not already there
                 if not new_name in chords_list:
                     chords_list[new_name] = new_chord
                 
+                #Create chord object and append to verse
                 temp_chord = {
                     'addition': new_addition,
                     'root': new_root,
@@ -112,6 +120,8 @@ def transpose(request):
                     'chord': new_chord,
                 }
                 new_verse[chord_key] = temp_chord
+
+            #Add verse to song
             transposed_song[verse_key] = new_verse
 
         #Create transposed chord list
@@ -128,7 +138,8 @@ def transpose(request):
             'length': data['length'],
             'quality': data['quality'],
             'song': transposed_song,
-            'chords': transposed_chords
+            'chords': transposed_chords,
+            'chordList': ordered_chord_list,
         }
 
         return JsonResponse(output)

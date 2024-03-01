@@ -64,8 +64,8 @@ const MusicPageOptions = (props) => {
     }
 
     return (
-        <div className='flex flex-col gap-4'>
-            <div className='flex text-2xl gap-4 flex-wrap font-light px-4'>
+        <div className='flex flex-col gap-4 px-4 max-xs:px-4'>
+            <div className='flex max-xs:text-base max-sm:text-lg text-2xl max-xs:gap-2 gap-4 flex-wrap font-light'>
                 {keys.map((key, index)=> 
                     <div onClick={() => handleKeyClick(key)} style={
                         (props.song['key'] === key) ? {backgroundColor: currentColor} : (clickedKey === key) ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
@@ -73,8 +73,8 @@ const MusicPageOptions = (props) => {
                     className='px-4 py-2' key={index}>{key}</div>
                     )}
             </div>
-            <div className='flex flex-wrap gap-4 px-4'> 
-                <div className='flex gap-4 text-2xl font-light'>
+            <div className='flex flex-wrap max-xs:gap-2 gap-4 '> 
+                <div className='flex max-xs:gap-2 gap-4 max-xs:text-base max-sm:text-lg text-2xl font-light'>
                 <div style={
                     (props.song['quality'] === 'Major') ? {backgroundColor: currentColor} : (clickedQuality === 'Major') ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
                 } 
@@ -85,14 +85,14 @@ const MusicPageOptions = (props) => {
                 onClick={() => handleQualityClick('Minor')} className='py-2 px-4'>Minor</div>
                 </div>
                 <form className='flex items-center xl:min-w-96 lg:min-w-72'>
-                    <label className='text-2xl font-light' htmlFor="lengthInput">{`Length (${clickedLength})`}</label>
+                    <label className='max-xs:text-base max-sm:text-lg text-2xl font-light' htmlFor="lengthInput">{`Length (${clickedLength})`}</label>
                     <input className=' bg-transparent' value={clickedLength} onChange={handleLengthChange} id='lengthInput' type="range" min={1} max={4}/>
                 </form>
             </div>
-            <div className='px-4'>
-                <button className='bg-teal-700/10 py-2 px-4 font-light border-2 border-teal-600 rounded-md hover:bg-zinc-600/20' onClick={() => setShowAdvanced(!showAdvanced)}>{showAdvanced ? 'Hide advanced settings' : 'Show advanced settings' }</button>
+            <div>
+                <button className='max-xs:text-sm max-xs:px-2 bg-teal-700/10 py-2 px-4 font-light border-2 border-teal-600 rounded-md hover:bg-zinc-600/20' onClick={() => setShowAdvanced(!showAdvanced)}>{showAdvanced ? 'Hide advanced settings' : 'Show advanced settings' }</button>
             </div>
-            <div className='px-4'>
+            <div>
                 {showAdvanced && 
                     <div className='flex flex-wrap gap-2 font-light text-lg'>
                         <label className='checkbox-label'>
