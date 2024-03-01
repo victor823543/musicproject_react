@@ -44,7 +44,7 @@ const LogIn = (props) => {
     
 
     return (
-        <div className='text-black'>
+        <div className='text-black dark:text-slate-200'>
             <h2 className='text-2xl font-montserrat mb-6 text-center'>LOGIN</h2>
             <form className='flex flex-col gap-4 text-end'>
                 <div className='login-div'>

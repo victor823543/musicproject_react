@@ -45,7 +45,7 @@ useEffect(() => {
 
   return (
     <div> 
-      <NavBar username={userName} isAuthenticated={isAuthenticated} logout={handleLogout}/>
+      <NavBar username={userName} isAuthenticated={isAuthenticated} logout={handleLogout} />
       <Routes>
         <Route path='/' element={
         <HomePage>

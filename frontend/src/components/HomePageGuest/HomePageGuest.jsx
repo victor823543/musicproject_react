@@ -1,5 +1,5 @@
 import '../../App.css'
-import image_grand_piano from '../../assets/images/grand-piano-far-away-in-dark-room-upscaled.jpg'
+import image_dark_piano from '../../assets/images/dark_grand.jpeg'
 import image_white_grand from '../../assets/images/white_grand.jpeg'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
@@ -49,14 +49,15 @@ const HomePageGuest = (props) => {
     
 
     return (
-        <div className='hideScrollbar h-screen'>
+        <div className='hideScrollbar h-screen '>
             <div className='flex flex-col justify-center items-center h-full'>
-                <div style={{backgroundImage: `url(${image_white_grand})`}} className='fixed bg-cover inset-0 bg-center -z-20'></div>
+                <div style={{backgroundImage: `url(${image_white_grand})`}} className='dark:hidden fixed bg-cover inset-0 bg-center -z-20'></div>
+                <div style={{backgroundImage: `url(${image_dark_piano})`}} className='dark:block hidden fixed bg-cover inset-0 bg-center -z-20'></div>
                 <div className=' fixed bg-cover inset-0 -z-10 backdrop-blur-md'></div>
                 {
                     showStart &&
-                    <div className={`flex flex-col items-center text-black px-6 md:px-12`}>
-                    <h1 className='text-center text-6xl max-md:text-5xl max-sm:text-4xl font-montserrat font-light text-shadow-lg shadow-white my-10'>Welcome to Learn Music</h1>
+                    <div className={`flex flex-col items-center text-black dark:text-slate-300 px-6 md:px-12`}>
+                    <h1 className='text-center text-6xl max-md:text-5xl max-sm:text-4xl font-montserrat font-light text-shadow-lg shadow-white dark:text-shadow dark:shadow-sky-400 my-10'>Welcome to Learn Music</h1>
                     {
                         !showLoginPage &&
                          <button className=' bg-slate-600/30 ring-2 ring-slate-900 rounded-lg py-2 px-4 w-44 mb-4 max-xs:mb-2 text-balance font-light max-xs:scale-75' onClick={handleLogOrCreateClick}>Log In or Create Account</button>
@@ -69,23 +70,26 @@ const HomePageGuest = (props) => {
             </div>    
                 
                 {showLoginPage && 
-                    <div  className={`flex flex-col justify-center items-center gap-4 h-full mt-16 text-black text-center`}>
-                        {showLogin && props.children[0]}
-                        {showSignup && props.children[1]}
-                        {showLogin ? (
-                            <>
-                            <p className=' font-montserrat font-light'>Not yet an account?</p>
-                            <button className='btn-w' onClick={handleCreateClick}>Create Account</button>
-                            </>
-                        ) : (
-                            <>
-                            <p className=' font-montserrat font-light'>Already have an account?</p>
-                            <button className='btn-w' onClick={handleLoginClick}>Log in</button>
-                            </>
-                        )}
+                    <div  className={`flex flex-col justify-center items-center gap-4 h-full mt-16 text-black dark:text-slate-200 text-center`}>
+                        <div className='dark:bg-slate-400/10 dark:px-10 dark:py-16 dark:shadow-2xl dark:rounded-md'>
+                            {showLogin && props.children[0]}
+                            {showSignup && props.children[1]}
+                            {showLogin ? (
+                                <>
+                                <p className=' font-montserrat font-light'>Not yet an account?</p>
+                                <button className='btn-w' onClick={handleCreateClick}>Create Account</button>
+                                </>
+                            ) : (
+                                <>
+                                <p className=' font-montserrat font-light'>Already have an account?</p>
+                                <button className='btn-w' onClick={handleLoginClick}>Log in</button>
+                                </>
+                            )}
+                            
+                            <p className=' font-montserrat font-light'>Just want to test out the site?</p>
+                            <button className='btn-w' onClick={handleGuestClick}>Continue as Guest</button>
+                        </div>
                         
-                        <p className=' font-montserrat font-light'>Just want to test out the site?</p>
-                        <button className='btn-w' onClick={handleGuestClick}>Continue as Guest</button>
                     </div>
                 }
                 

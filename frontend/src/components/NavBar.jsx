@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import ToggleTheme from './ToggleTheme'
 import HamburgerIcon from '../assets/icons/burger-menu.svg'
 import HamburgerWhiteIcon from '../assets/icons/burger-menu-white.svg'
 import CloseButton from '../assets/icons/close-button.svg'
@@ -47,11 +48,15 @@ const NavBar = (props) => {
                             </li>
                         )}
                 </ul>
-                {props.isAuthenticated ? 
-                    <button onClick={props.logout} className='bg-slate-200 px-4 py-2 text-sm font-light rounded-lg ring-1 ring-slate-400 max-lg:hidden'>Log Out</button>
-                    :
-                    <button className='bg-slate-200 px-4 py-2 text-sm font-light rounded-lg ring-1 ring-slate-400 max-lg:hidden'>Log In</button>
-                }
+                <div className='flex items-center max-lg:hidden'>
+                    <div><ToggleTheme /></div>
+                    {props.isAuthenticated ? 
+                        <button onClick={props.logout} className='bg-slate-200 px-4 py-2 text-sm font-light rounded-lg ring-1 ring-slate-400 max-lg:hidden'>Log Out</button>
+                        :
+                        <button className='bg-slate-200 px-4 py-2 text-sm font-light rounded-lg ring-1 ring-slate-400 max-lg:hidden'>Log In</button>
+                    }
+                </div>
+                
                 
                 <div onClick={() => setSidebarOpen(true)} className='lg:hidden'>
                     <img src={HamburgerIcon} alt="Icon" width={30} height={30} className='dark:hidden'/>

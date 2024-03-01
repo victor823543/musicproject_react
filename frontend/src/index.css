@@ -2,9 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    .bg-mp {
+        @apply bg-zinc-200 dark:bg-gradient-to-br dark:from-black dark:to-slate-800
+    }
+}
+
 @layer components {
     .checkbox-label {
         @apply flex items-center gap-1 py-1 px-2 border-2 border-teal-600 shadow-sm shadow-teal-500/30 max-sm:text-sm 
+    }
+
+    .teal-label {
+        @apply max-sm:text-2xl max-xs:text-xl text-3xl text-center font-extralight text-zinc-50 lg:text-teal-950 text-shadow-lg shadow-teal-800 dark:text-teal-600
+    }
+
+    .teal-select {
+        @apply bg-slate-800 text-white dark:text-teal-200 font-light text-lg sm:text-2xl lg:text-3xl max-xs:w-fit py-2 px-4 rounded-sm shadow-sm shadow-teal-500 dark:shadow-md dark:shadow-teal-300
     }
     
 }

@@ -9,6 +9,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/src/App.css">
     <title>Vite + React</title>
+
+    <script>
+      if (localStorage.darkMode === 'true') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
+
   </head>
   <body class="hideScrollbar">
     <div id="root"></div>

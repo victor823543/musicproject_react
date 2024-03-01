@@ -182,7 +182,7 @@ const MusicPage = () => {
     }
 
     return (
-        <div className={`${song && 'bg-zinc-200'} min-h-screen flex flex-col justify-center items-center py-4`}>
+        <div className={`${song && 'bg-mp'} min-h-screen flex flex-col justify-center items-center`}>
             
                 {!song  && <MusicPageForm 
                     onSelectKeyChange={handleSelectKeyChange} 
@@ -193,7 +193,7 @@ const MusicPage = () => {
                 {song && 
                 <>
                 {/* For bigger than sm device width */}
-                <div className='w-full h-full flex max-lg:flex-col max-sm:hidden'>
+                <div className='w-full h-full flex max-lg:flex-col max-sm:hidden mt-28 mb-6 dark:text-teal-200/80'>
                     <div className='w-full h-20 lg:hidden'></div>
                     <div className='absolute w-full h-full bg-zinc-200 inset-0 -z-20'></div>
                     <div className='lg:w-1/2 h-full flex flex-col justify-between'>
@@ -207,8 +207,8 @@ const MusicPage = () => {
                     
                 </div>
 
-                {/* For bigger than sm device width */}
-                <div className='w-full h-full flex flex-col sm:hidden'>
+                {/* For smaller than sm device width */}
+                <div className='w-full h-full flex flex-col dark:text-teal-200/80 sm:hidden'>
                     <div className='absolute w-screen h-screen bg-zinc-200 inset-0 -z-20'></div>
                     <div className='w-full h-20 lg:hidden'></div>
                     {showModal && 
@@ -231,7 +231,7 @@ const MusicPage = () => {
                     }
                     
     
-                    <div className='h-full flex flex-col justify-between'>
+                    <div className='h-full flex flex-col justify-between mb-4'>
 
                         
 

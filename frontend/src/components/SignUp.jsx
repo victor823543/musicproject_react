@@ -50,7 +50,7 @@ const SignUp = (props) => {
     }
 
     return (
-        <div className='flex flex-col text-black'>
+        <div className='flex flex-col text-black dark:text-slate-200'>
             <h2 className='text-2xl font-montserrat mb-6 text-center'>CREATE ACCOUNT</h2>
             <form className='flex flex-col gap-4 text-end'>
                 <div className='login-div'>
