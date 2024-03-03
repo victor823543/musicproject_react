@@ -55,15 +55,15 @@ const SignUp = (props) => {
             <form className='flex flex-col gap-4 text-end'>
                 <div className='login-div'>
                     <label className=' font-montserrat font-light' htmlFor="signUpUsername">Username: </label>
-                    <input className=' text-black bg-zinc-100/30 px-1' type="text" id='signUpUsername' value={inputData['username']} onChange={handleUsernameChange} />
+                    <input className='bg-zinc-100/30 px-1' type="text" id='signUpUsername' value={inputData['username']} onChange={handleUsernameChange} />
                 </div>
                 <div className='login-div'>
                     <label className=' font-montserrat font-light' htmlFor="email">Email: </label>
-                    <input className=' text-black bg-zinc-100/30 px-1' type="text" id='email' value={inputData['email']} onChange={handleEmailChange} />
+                    <input className='bg-zinc-100/30 px-1' type="text" id='email' value={inputData['email']} onChange={handleEmailChange} />
                 </div>
                 <div className='login-div'>
                     <label className=' font-montserrat font-light' htmlFor="signUpPassword">Password: </label>
-                    <input className=' text-black bg-zinc-100/30 px-1' type="password" id='signUpPassword' value={inputData['password']} onChange={handlePasswordChange} />
+                    <input className='bg-zinc-100/30 px-1' type="password" id='signUpPassword' value={inputData['password']} onChange={handlePasswordChange} />
                 </div>
                 <div className='flex justify-center'>
                     <button className=' bg-slate-200 w-fit py-2 px-4 text-black font-montserrat font-light text-sm rounded-md ring-2 ring-slate-400' type='submit' onClick={handleSubmit}>Submit</button>

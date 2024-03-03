@@ -6,7 +6,7 @@ import HamburgerWhiteIcon from '../assets/icons/burger-menu-white.svg'
 import CloseButton from '../assets/icons/close-button.svg'
 import CloseButtonWhite from '../assets/icons/close-button-white.svg'
 
-const SideBar = ({isOpen, closeSidebar, navObject, isAuthenticated, logout}) => {
+const SideBar = ({isOpen, closeSidebar, navObject, isAuthenticated, logout, themeComponent}) => {
     
 
     return (
@@ -22,6 +22,7 @@ const SideBar = ({isOpen, closeSidebar, navObject, isAuthenticated, logout}) => 
                     :
                     <button className='bg-slate-200 px-4 py-2 text-sm font-light rounded-lg ring-1 ring-slate-400'>Log In</button>
                 }
+                <div>{themeComponent}</div>
             </ul>
             <div onClick={closeSidebar} className='absolute top-2 right-2'>
                 <img src={CloseButton} alt="Close" width={50} height={50} className='dark:hidden' />
@@ -34,6 +35,20 @@ const SideBar = ({isOpen, closeSidebar, navObject, isAuthenticated, logout}) => 
 
 const NavBar = (props) => {
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [darkMode, setDarkMode] = useState(() => {
+        const storedDarkMode = localStorage.getItem('darkMode')
+        return (storedDarkMode === 'true')
+    })
+
+    const toggleDarkMode = () => {
+        localStorage.setItem('darkMode', !darkMode)
+        if (darkMode) {
+            document.documentElement.classList.remove('dark')
+        } else {
+            document.documentElement.classList.add('dark')
+        }
+        setDarkMode(prev => !prev)
+    }
 
     const navItems = {'Home': '/', 'Create music': '/music', 'Ear Training': '/eartraining', 'Account': '/account'}
 
@@ -48,8 +63,8 @@ const NavBar = (props) => {
                             </li>
                         )}
                 </ul>
-                <div className='flex items-center max-lg:hidden'>
-                    <div><ToggleTheme /></div>
+                <div className='flex gap-2 items-center max-lg:hidden'>
+                    <div><ToggleTheme mode={darkMode} toggle={toggleDarkMode}/></div>
                     {props.isAuthenticated ? 
                         <button onClick={props.logout} className='bg-slate-200 px-4 py-2 text-sm font-light rounded-lg ring-1 ring-slate-400 max-lg:hidden'>Log Out</button>
                         :
@@ -64,7 +79,7 @@ const NavBar = (props) => {
                 </div>
 
             </nav>
-            <SideBar isOpen={sidebarOpen} closeSidebar={() => setSidebarOpen(false)} navObject={navItems} isAuthenticated={props.isAuthenticated} logout={props.logout} />
+            <SideBar isOpen={sidebarOpen} closeSidebar={() => setSidebarOpen(false)} navObject={navItems} isAuthenticated={props.isAuthenticated} logout={props.logout} themeComponent={<ToggleTheme mode={darkMode} toggle={toggleDarkMode}/>} />
         </header>
     )
 }

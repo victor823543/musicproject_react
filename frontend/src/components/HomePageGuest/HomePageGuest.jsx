@@ -71,7 +71,7 @@ const HomePageGuest = (props) => {
                 
                 {showLoginPage && 
                     <div  className={`flex flex-col justify-center items-center gap-4 h-full mt-16 text-black dark:text-slate-200 text-center`}>
-                        <div className='dark:bg-slate-400/10 dark:px-10 dark:py-16 dark:shadow-2xl dark:rounded-md'>
+                        <div className='bg-teal-600/10 dark:bg-slate-400/10 px-10 py-16 shadow-2xl rounded-md'>
                             {showLogin && props.children[0]}
                             {showSignup && props.children[1]}
                             {showLogin ? (

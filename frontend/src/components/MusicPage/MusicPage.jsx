@@ -213,18 +213,18 @@ const MusicPage = () => {
                     <div className='w-full h-20 lg:hidden'></div>
                     {showModal && 
                         <div className='fixed top-0 left-0 w-full h-full flex items-center justify-center bg-zinc-800 bg-opacity-50 z-10 pt-20 pb-4'>
-                            <div className='bg-zinc-200 max-h-full xsPlus:px-8 py-8 rounded-lg shadow-md overflow-scroll'>
+                            <div className='bg-zinc-200 dark:bg-slate-700 max-h-full xsPlus:px-8 py-8 rounded-lg shadow-md overflow-scroll'>
                                 <MusicPageOptions song={song} handleCreateClick={handleCreateNewClick} handleTransposeClick={handleTransposeClick} />
-                                <button className='bg-red-300 border-2 border-red-500 px-4 py-2 rounded-md mt-4 font-light ml-4' onClick={toggleModal}>Close</button>
+                                <button className='bg-red-300 border-2 border-red-500 px-4 py-2 rounded-md mt-4 text-black font-light ml-4' onClick={toggleModal}>Close</button>
                             </div>
                             
                         </div>
                     }
                     {showAudioModal && 
                         <div className='fixed top-0 left-0 w-full h-full flex items-center justify-center bg-zinc-800 bg-opacity-50 z-10 pt-20 pb-4'>
-                            <div className='bg-zinc-200 max-h-full xsPlus:px-8 py-8 rounded-lg shadow-md overflow-scroll'>
+                            <div className='bg-zinc-200 dark:bg-slate-700 max-h-full xsPlus:px-8 py-8 rounded-lg shadow-md overflow-scroll'>
                                 <MusicPageAudio audio={songAudio} handleGetAudioClick={fetchSongAudio} handleProgress={handleProgress} inModal={true}/>    
-                                <button className='bg-red-300 border-2 border-red-500 px-4 py-2 rounded-md mt-4 font-light ml-4' onClick={toggleAudioModal}>Close</button>
+                                <button className='bg-red-300 border-2 border-red-500 px-4 py-2 rounded-md mt-4 text-black font-light ml-4' onClick={toggleAudioModal}>Close</button>
                             </div>
                             
                         </div>

@@ -7,9 +7,9 @@ const MusicPageAudio = (props) => {
     const [currentOption, setCurrentOption] = useState({chords: null, base: null, tempo: 2})
     const [clickedOption, setClickedOption] = useState({chords: null, base: null, tempo: 2})
     
-    const currentColor = 'rgba(52, 83, 184, 0.733)'
-    const defaultColor = 'rgba(255, 255, 255, 0.33)'
-    const clickedColor = 'rgba(234, 192, 43, 0.385)'
+    const currentColor = 'bg-teal-600/60 dark:bg-teal-600'
+    const defaultColor = 'bg-slate-500/20'
+    const clickedColor = 'bg-cyan-300/60 dark:bg-cyan-500/70'
 
     const options = ['Basic', 'Arpeggio']
     const baseOptions = ['None', 'Basic', 'Double', 'Arpeggio']
@@ -66,20 +66,16 @@ const MusicPageAudio = (props) => {
                         </form>
                         <div className='flex flex-wrap gap-4 max-xs:text-base text-xl'>
                             {options.map((option, index) => 
-                                <div onClick={() => handleOptionClick(index, 0)} style={
-                                    (currentOption.chords === index) ? {backgroundColor: currentColor} : (clickedOption.chords === index) ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
-                                } 
-                                className='font-light py-2 px-4 bg-slate-900 rounded-sm' key={index}>
+                                <div onClick={() => handleOptionClick(index, 0)} 
+                                className={`font-light py-2 px-4 bg-slate-900 rounded-sm ${(currentOption.chords === index) ? currentColor : (clickedOption.chords === index) ? clickedColor : defaultColor}`} key={index}>
                                     {option}
                                 </div>
                             )}
                         </div>
                         <div className='flex flex-wrap gap-4 max-xs:text-base text-xl'> 
                             {baseOptions.map((option, index) => 
-                                <div onClick={() => handleOptionClick(index, 1)} style={
-                                    (currentOption.base === index) ? {backgroundColor: currentColor} : (clickedOption.base === index) ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
-                                }
-                                className='font-light py-2 px-4 bg-slate-900 rounded-sm' key={index}>
+                                <div onClick={() => handleOptionClick(index, 1)}
+                                className={`font-light py-2 px-4 bg-slate-900 rounded-sm ${(currentOption.base === index) ? currentColor : (clickedOption.base === index) ? clickedColor : defaultColor}`} key={index}>
                                     {option}
                                 </div>
                             )}

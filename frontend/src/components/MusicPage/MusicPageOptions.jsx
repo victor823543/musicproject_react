@@ -21,9 +21,9 @@ const MusicPageOptions = (props) => {
 
     const keys = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'Db', 'Eb', 'Gb', 'Ab', 'Bb']
 
-    const currentColor = 'rgba(52, 83, 184, 0.733)'
-    const defaultColor = 'rgba(255, 255, 255, 0.33)'
-    const clickedColor = 'rgba(234, 192, 43, 0.385)'
+    const currentColor = 'bg-teal-600/60 dark:bg-teal-600'
+    const defaultColor = 'bg-slate-500/20'
+    const clickedColor = 'bg-cyan-300/60 dark:bg-cyan-500/70'
 
     const handleKeyClick = (keyClickedOn) => {
         setClickedKey(keyClickedOn)
@@ -67,22 +67,16 @@ const MusicPageOptions = (props) => {
         <div className='flex flex-col gap-4 px-4 max-xs:px-4'>
             <div className='flex max-xs:text-base max-sm:text-lg text-2xl max-xs:gap-2 gap-4 flex-wrap font-light'>
                 {keys.map((key, index)=> 
-                    <div onClick={() => handleKeyClick(key)} style={
-                        (props.song['key'] === key) ? {backgroundColor: currentColor} : (clickedKey === key) ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
-                    } 
-                    className='px-4 py-2' key={index}>{key}</div>
+                    <div onClick={() => handleKeyClick(key)}
+                    className={`px-4 py-2 ${(props.song['key'] === key) ? currentColor : (clickedKey === key) ? clickedColor : defaultColor}`} key={index}>{key}</div>
                     )}
             </div>
             <div className='flex flex-wrap max-xs:gap-2 gap-4 '> 
                 <div className='flex max-xs:gap-2 gap-4 max-xs:text-base max-sm:text-lg text-2xl font-light'>
-                <div style={
-                    (props.song['quality'] === 'Major') ? {backgroundColor: currentColor} : (clickedQuality === 'Major') ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
-                } 
-                onClick={() => handleQualityClick('Major')} className='py-2 px-4'>Major</div>
-                <div style={
-                    (props.song['quality'] === 'Minor') ? {backgroundColor: currentColor} : (clickedQuality === 'Minor') ? {backgroundColor: clickedColor} : {backgroundColor: defaultColor}
-                }  
-                onClick={() => handleQualityClick('Minor')} className='py-2 px-4'>Minor</div>
+                <div
+                onClick={() => handleQualityClick('Major')} className={`py-2 px-4 ${(props.song['quality'] === 'Major') ? currentColor : (clickedQuality === 'Major') ? clickedColor : defaultColor}`}>Major</div>
+                <div
+                onClick={() => handleQualityClick('Minor')} className={`py-2 px-4 ${(props.song['quality'] === 'Minor') ? currentColor : (clickedQuality === 'Minor') ? clickedColor : defaultColor}`}>Minor</div>
                 </div>
                 <form className='flex items-center xl:min-w-96 lg:min-w-72'>
                     <label className='max-xs:text-base max-sm:text-lg text-2xl font-light' htmlFor="lengthInput">{`Length (${clickedLength})`}</label>
