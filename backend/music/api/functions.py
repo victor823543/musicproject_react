@@ -337,3 +337,40 @@ def new_base(song, variation):
     
     return new_base
 
+
+#Create interval session
+def generate_interval_session(intervals_included, directions, width, length, progression_rate):
+    interval_names = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
+    if width == 0:
+        starting_note = 60
+        scope_length = 12
+    elif width == 1: 
+        starting_note = 48
+        scope_length = 24
+    elif width == 2:
+        starting_note = scope_length = 36
+
+    intervals = {}
+    for n in range(length):
+        interval_number = random.choice(intervals_included)
+        root = random.randrange(starting_note, starting_note + scope_length)
+        interval = []
+        interval_obj = {}
+        if 'Up' in directions:
+            interval.append([root])
+            interval.append([root + interval_number])
+        if 'Down' in directions:
+            interval.append([root])
+            interval.append([root - interval_number])
+        if 'Unison' in directions:
+            interval.append([root, root + interval_number])
+        interval_obj['numbers'] = interval
+        interval_obj['name'] = interval_names[interval_number - 1]
+        intervals[n] = interval_obj
+    
+    session = {
+        'intervals': intervals,
+        'progression_rate': progression_rate,
+    }
+    
+    return session

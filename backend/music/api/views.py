@@ -14,7 +14,7 @@ import mingus.core.scales as scales
 from mingus.containers import Note
 import random
 import json
-from .functions import create_new_song, generate_audio
+from .functions import create_new_song, generate_audio, generate_interval_session
 
 #Authentication
 @api_view(['POST'])
@@ -166,3 +166,20 @@ def get_audio(request):
 
         response = HttpResponse(mp3_bytes, content_type='audio/mpeg')
         return response
+    
+@csrf_exempt
+def get_interval(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        intervals = [int(interval) for interval in data['intervals']]
+        directions = data['directions']
+        width = int(data['width'])
+        length = int(data['length'])
+        progression_rate = data['progression']
+
+        session_object = generate_interval_session(intervals, directions, width, length, progression_rate)
+
+        response = JsonResponse(session_object)
+        return response
+
+

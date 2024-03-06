@@ -24,6 +24,10 @@ export default {
       screens: {
         'xs': '410px',
         'xsPlus': '500px',
+      },
+      rotate: {
+        '25': '25deg',
+        '30': '30deg',
       }
     },
   },

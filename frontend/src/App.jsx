@@ -6,6 +6,7 @@ import HomePageGuest from './components/HomePageGuest/HomePageGuest';
 import HomePageAuth from './components/HomePageAuth/HomePageAuth';
 import NavBar from './components/NavBar';
 import MusicPage from './components/MusicPage/MusicPage';
+import EarTraining from './components/EarTraining/EarTraining';
 import './App.css';
 import {Route, Routes} from 'react-router-dom';
 import { useState, useEffect } from 'react'
@@ -67,6 +68,10 @@ useEffect(() => {
         </HomePage>
         }/>
         <Route path='/music' element={<MusicPage token={authToken} username={userName} isAuthenticated={isAuthenticated} />} />
+        <Route path='/eartraining/*' element={
+          <EarTraining />
+        } />
+        
       </Routes>
           
     </div>

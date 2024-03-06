@@ -67,7 +67,7 @@ const MusicPageAudio = (props) => {
                         <div className='flex flex-wrap gap-4 max-xs:text-base text-xl'>
                             {options.map((option, index) => 
                                 <div onClick={() => handleOptionClick(index, 0)} 
-                                className={`font-light py-2 px-4 bg-slate-900 rounded-sm ${(currentOption.chords === index) ? currentColor : (clickedOption.chords === index) ? clickedColor : defaultColor}`} key={index}>
+                                className={`font-light py-2 px-4 rounded-sm ${(currentOption.chords === index) ? currentColor : (clickedOption.chords === index) ? clickedColor : defaultColor}`} key={index}>
                                     {option}
                                 </div>
                             )}
@@ -75,7 +75,7 @@ const MusicPageAudio = (props) => {
                         <div className='flex flex-wrap gap-4 max-xs:text-base text-xl'> 
                             {baseOptions.map((option, index) => 
                                 <div onClick={() => handleOptionClick(index, 1)}
-                                className={`font-light py-2 px-4 bg-slate-900 rounded-sm ${(currentOption.base === index) ? currentColor : (clickedOption.base === index) ? clickedColor : defaultColor}`} key={index}>
+                                className={`font-light py-2 px-4 rounded-sm ${(currentOption.base === index) ? currentColor : (clickedOption.base === index) ? clickedColor : defaultColor}`} key={index}>
                                     {option}
                                 </div>
                             )}
