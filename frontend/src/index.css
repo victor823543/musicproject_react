@@ -46,7 +46,7 @@
         @apply text-3xl max-xs:text-xl max-sm:text-2xl font-montserrat text-center mb-6 max-xs:mb-2 dark:text-sky-100
     }
     .modal-btn {
-        @apply dark:text-sky-100 dark:text-shadow dark:shadow-sky-400 ring-2 ring-blue-800/60 dark:ring-blue-800 py-2 px-4 rounded-md shadow-md dark:shadow-sm text-xl font-montserrat font-light
+        @apply dark:text-sky-100 dark:text-shadow dark:shadow-sky-400 ring-2 ring-blue-800/60 dark:ring-blue-800 py-2 px-4 max-xs:py-1 max-xs:px-3 rounded-md shadow-md dark:shadow-sm text-xl max-sm:text-base max-xs:text-sm font-montserrat font-light
     }
     
 }

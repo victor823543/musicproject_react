@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-const IntervalsSettings = (props) => {
-    const [clickedIntervals, setClickedIntervals] = useState({
+const ChordsSettings = (props) => {
+    const [clickedChords, setClickedChords] = useState({
+        0: true,
         1: true, 
         2: true, 
         3: true, 
@@ -12,38 +13,33 @@ const IntervalsSettings = (props) => {
         8: true, 
         9: true, 
         10: true, 
-        11: true, 
-        12: true
     })
-    const [clickedDirections, setClickedDirections] = useState({
-        'Up': true,
-        'Down': false,
-        'Unison': false,
-    })
+    const [clickedStyle, setClickedStyle] = useState(0)
     const [clickedScope, setClickedScope] = useState(0)
     const [clickedLength, setClickedLength] = useState('10')
-    const [clickedProgression, setClickedProgression] = useState('Slow')
+    const [clickedInversion, setClickedInversion] = useState({
+        1: false,
+        2: false,
+    })
 
    
-    const intervals = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
+    const chords = ['Major', 'Minor', 'Diminished', 'Augmented', 'Major seventh', 'Minor seventh', 'Dominant seventh', 'Major sixth', 'Minor sixth', 'Suspended second', 'Suspended fourth']
+    const chordStyles = ['Unison', 'Arpeggio']
     const octaveScopes = ['4', '3-5', '2-6']
     const sessionLengths = ['10', '20', '30', '50']
-    const difProgression = ['None', 'Slow', 'Fast']
+    const inversions = ['First inversion', 'Second inversion']
     const clickedColor = 'bg-sky-400/30 dark:bg-sky-400/40'
     const defaultColor = 'bg-amber-500/20 dark:bg-blue-500/20 hover:bg-sky-400/10 hover:dark:bg-sky-400/30'
 
-    const handleIntervalClick = (interval) => {
-        setClickedIntervals({
-            ...clickedIntervals,
-            [interval]: !clickedIntervals[interval],
+    const handleChordClick = (chord) => {
+        setClickedChords({
+            ...clickedChords,
+            [chord]: !clickedChords[chord],
         })
     }
 
-    const handleDirectionClick = (dir, bool) => {
-        setClickedDirections({
-            ...clickedDirections,
-            [dir]: !bool
-        })
+    const handleStyleClick = (index) => {
+        setClickedStyle(index)
     }
 
     const handleScopeClick = (index) => {
@@ -54,23 +50,25 @@ const IntervalsSettings = (props) => {
         setClickedLength(length)
     }
 
-    const handleProgressionClick = (progressionRate) => {
-        setClickedProgression(progressionRate)
+    const handleInversionClick = (index) => {
+        setClickedInversion({
+            ...clickedInversion,
+            [index]: !clickedInversion[index],
+        })
     }
 
     const handleStartClick = () => {
-        const intervals_out = Object.keys(clickedIntervals).filter(key => clickedIntervals[key])
-        const directions = Object.keys(clickedDirections).filter(key => clickedDirections[key])
-
-        const intervalNames = Array.from(intervals_out, (n, _) => intervals[n - 1])
+        const chords_out = Object.keys(clickedChords).filter(key => clickedChords[key])
+        const inversions_out = Object.keys(clickedInversion).filter(key => clickedInversion[key])
+        const chordNames = Array.from(chords_out, (n, _) => chords[n])
 
         const params = {
-            'intervals': intervals_out,
-            'directions': directions,
+            'chords_included': chords_out,
+            'style': clickedStyle,
             'width': clickedScope,
             'length': clickedLength,
-            'progression': clickedProgression,
-            'interval_names': intervalNames,
+            'inversions': inversions_out,
+            'chord_names': chordNames,
         }
         
         props.handleStartClick(params)
@@ -87,8 +85,8 @@ const IntervalsSettings = (props) => {
                     <div className='px-10 max-xs:px-4 md:border-r-2 md:border-sky-600 dark:md:border-blue-900'>
                         <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Directions</h1>
                         <div className='flex justify-center gap-4 flex-wrap'>
-                            {Object.entries(clickedDirections).map(([direction, bool]) => 
-                                <div key={direction} onClick={() => handleDirectionClick(direction, bool)} className={`${bool ? clickedColor : defaultColor} modal-btn`}>{direction}</div>
+                            {chordStyles.map((style, index) => 
+                                <div key={style} onClick={() => handleStyleClick(index)} className={`${(clickedStyle === index) ? clickedColor : defaultColor} modal-btn`}>{style}</div>
                             )}
                         </div>
                     </div>
@@ -104,26 +102,26 @@ const IntervalsSettings = (props) => {
                         <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Session length</h1>
                         <div className='flex justify-center gap-4 flex-wrap'>
                             {sessionLengths.map((length) => 
-                                <div key={length} onClick={() => handleLengthClick(length)} className={`${(clickedLength === length ? clickedColor : defaultColor)} modal-btn`} >{length}</div>
+                                <div key={length} onClick={() => handleLengthClick(length)} className={`${(clickedLength === length) ? clickedColor : defaultColor} modal-btn`} >{length}</div>
                             )}
                         </div>
                     </div>
                     <div className='px-10 max-xs:px-4 mt-8 max-xs:mt-4'>
                         <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Difficulty progression</h1>
                         <div className='flex justify-center gap-4 flex-wrap'>
-                            {difProgression.map((rate) => 
-                                <div key={rate} onClick={() => handleProgressionClick(rate)} className={`${(clickedProgression === rate) ? clickedColor : defaultColor} modal-btn`}>{rate}</div>
+                            {inversions.map((inversion, index) => 
+                                <div key={inversion} onClick={() => handleInversionClick(index)} className={`${(clickedInversion === index) ? clickedColor : defaultColor} modal-btn`}>{inversion}</div>
                             )}
                         </div>
                     </div>
                 </div>
                 
                 <div className='flex flex-col items-center mt-8 max-xs:mt-4 max-w-[1100px] px-10 max-xs:px-4'>
-                    <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Include intervals</h1>
+                    <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Include chords</h1>
                     <div className='flex justify-center gap-4 flex-wrap max-xs:grid max-xs:grid-cols-2'>
-                        {intervals.map((interval, index) => 
-                                <div onClick={() => handleIntervalClick(index + 1)} key={interval} className={`${clickedIntervals[index + 1] ? clickedColor : defaultColor} modal-btn max-xs:text-nowrap max-xs:overflow-hidden max-xs:text-ellipsis` }>
-                                    {interval}
+                        {chords.map((chord, index) => 
+                                <div onClick={() => handleChordClick(index)} key={chord} className={`${clickedChords[index] ? clickedColor : defaultColor} modal-btn max-xs:text-nowrap max-xs:overflow-hidden max-xs:text-ellipsis` }>
+                                    {chord}
                                 </div>
                         )}
 
@@ -141,4 +139,4 @@ const IntervalsSettings = (props) => {
   )
 }
 
-export default IntervalsSettings
+export default ChordsSettings

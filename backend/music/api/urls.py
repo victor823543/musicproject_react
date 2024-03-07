@@ -9,6 +9,7 @@ urlpatterns = [
     path('transpose/', views.transpose),
     path('audio/', views.get_audio),
     path('interval/', views.get_interval),
+    path('chord/', views.get_chords),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

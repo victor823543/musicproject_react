@@ -10,7 +10,7 @@ const SideBar = ({isOpen, closeSidebar, navObject, isAuthenticated, logout, them
     
 
     return (
-        <div className={`fixed inset-y-0 right-0 bg-zinc-100 dark:bg-black w-64 p-4 z-20 ${isOpen ? 'block' : 'hidden'}`}>
+        <div className={`fixed inset-y-0 right-0 bg-zinc-100 dark:bg-black w-64 p-4 z-40 ${isOpen ? 'block' : 'hidden'}`}>
             <ul className=' flex flex-col gap-6'>
                 {Object.entries(navObject).map(([name, route], index) =>
                     <li key={index}>
@@ -53,7 +53,7 @@ const NavBar = (props) => {
     const navItems = {'Home': '/', 'Create music': '/music', 'Ear Training': '/eartraining', 'Account': '/account'}
 
     return (
-        <header className='fixed w-full py-5 px-4 z-20 bg-zinc-100 dark:bg-black/40 '>
+        <header className='fixed w-full py-5 px-4 z-40 bg-zinc-100 dark:bg-black/40 '>
             <nav className='flex justify-between items-center'>
                 <a href="/" className=' font-montserrat font-bold text-xl dark:text-teal-200'>LearnMusic</a>
                 <ul className='flex justify-center items-center gap-12 max-lg:hidden'>

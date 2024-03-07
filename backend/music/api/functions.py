@@ -1,6 +1,7 @@
 import mingus.core.intervals as intervals
 import mingus.core.chords as chords
 import mingus.core.scales as scales
+import mingus.core.notes as notes
 from mingus.containers import Note
 import pretty_midi as pm
 from midi2audio import FluidSynth
@@ -373,4 +374,98 @@ def generate_interval_session(intervals_included, directions, width, length, pro
         'progression_rate': progression_rate,
     }
     
+    return session
+
+def generate_chords_session(chords_included, style, width, length, inversions):
+    session = {}
+
+    def get_start_note():
+        number = random.randrange(12)
+        note = notes.int_to_note(number)
+        return note
+    
+    def get_octave(width=width):
+        if width == 1:
+            return random.randrange(3, 6)
+        elif width == 2:
+            return random.randrange(2, 7)
+        else:
+            return 4
+    
+    def get_type(types_included=chords_included):
+        return random.choice(types_included)
+
+    def get_chord_numbers(note, type, octave, inversions=inversions):
+        
+        if type == 0:
+            c = chords.major_triad(note)
+            name = 'Major'
+        elif type == 1:
+            c = chords.minor_triad(note)
+            name = 'Minor'
+        elif type == 2:
+            c = chords.diminished_triad(note)
+            name = 'Diminished'
+        elif type == 3:
+            c = chords.augmented_triad(note)
+            name = 'Augmented'
+        elif type == 4:
+            c = chords.major_seventh(note)
+            name = 'Major seventh'
+        elif type == 5:
+            c = chords.minor_seventh(note)
+            name = 'Minor seventh'
+        elif type == 6:
+            c = chords.dominant_seventh(note)
+            name = 'Dominant seventh'
+        elif type == 7:
+            c = chords.major_sixth(note)
+            name = 'Major sixth'
+        elif type == 8:
+            c = chords.minor_sixth(note)
+            name = 'Minor sixth'
+        elif type == 9:
+            c = chords.suspended_second_triad(note)
+            name = 'Suspended second'
+        elif type == 10:
+            c = chords.suspended_fourth_triad(note)
+            name = 'Suspended fourth'
+        
+        if len(inversions) > 1:
+            n = random.choice(inversions)
+            if n == 1:
+                c = chords.first_inversion(c)
+            elif n == 2:
+                c = chords.second_inversion(c)
+
+
+        chord_numbers = [int(Note(note, octave)) for note in c]
+        for index, number in enumerate(chord_numbers):
+                former_index = index - 1
+                if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]):
+                    chord_numbers[index] += 12
+        
+        return chord_numbers, name
+        
+
+    chords_obj = {}
+
+    for n in range(length):
+        start_note = get_start_note()
+        type = get_type()
+        octave = get_octave()
+        chord_numbers, chord_name = get_chord_numbers(start_note, type, octave)
+
+        if style:
+            chord_numbers = [[note] for note in chord_numbers]
+        else:
+            chord_numbers = [chord_numbers]
+
+        chords_obj[n] = {
+            'name': chord_name,
+            'numbers': chord_numbers,
+        }
+
+    session['chords'] = chords_obj
+
     return session

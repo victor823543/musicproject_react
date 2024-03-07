@@ -14,7 +14,7 @@ import mingus.core.scales as scales
 from mingus.containers import Note
 import random
 import json
-from .functions import create_new_song, generate_audio, generate_interval_session
+from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session
 
 #Authentication
 @api_view(['POST'])
@@ -178,8 +178,23 @@ def get_interval(request):
         progression_rate = data['progression']
 
         session_object = generate_interval_session(intervals, directions, width, length, progression_rate)
-
         response = JsonResponse(session_object)
         return response
 
+@csrf_exempt
+def get_chords(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        chords_included = [int(note) for note in data['chords_included']]
+        style = int(data['style'])
+        width = int(data['width'])
+        length = int(data['length'])
+        inversions = [int(inversion) for inversion in data['inversions']]
+        if inversions:
+            inversions[0] = 0
+        else:
+            inversions = [0]
 
+        session_object = generate_chords_session(chords_included, style, width, length, inversions)
+        response = JsonResponse(session_object)
+        return response
