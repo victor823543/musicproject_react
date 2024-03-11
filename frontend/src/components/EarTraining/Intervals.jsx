@@ -122,7 +122,9 @@ const Intervals = () => {
                 })
             }
             setPassedInterval(passed)
-        } 
+        } else {
+            refMidi.current.setMasterVolume(0.5)
+        }
         if (!(progress === Object.keys(result).length)) {
             playInterval(intervalSession['intervals'][progress]['numbers'])
             setGuess('')
@@ -254,7 +256,6 @@ const Intervals = () => {
                 ref={refMidi}
                 appElementName='root'
                 instruments={[0]}
-                
             />
             </div>
         }

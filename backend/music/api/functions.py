@@ -469,3 +469,163 @@ def generate_chords_session(chords_included, style, width, length, inversions):
     session['chords'] = chords_obj
 
     return session
+
+
+def generate_progression_session(chords_included, start, length, progression_length, inversions):
+    session = {}
+
+    romans_list = ['I', 'IV', 'V', 'vi', 'ii', 'iii', 'I7', 'ii7', 'iii7', 'IV7', 'V7', 'vi7']
+
+    def get_key():
+        number = random.randrange(12)
+        key = notes.int_to_note(number, 'b')
+        return key
+    
+    def get_scale(key):
+        return scales.Ionian(key)
+
+    def get_chord_id(chords_included=chords_included):
+        if chords_included == 0:
+            chord_id = random.randrange(4)
+        if chords_included == 1:
+            chord_id = random.randrange(6)
+        if chords_included == 2:
+            chord_id = random.randrange(12)
+        return chord_id
+
+    def generate_chord(key, chord_id):
+        
+        if chord_id == 0:
+            c = chords.I(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'I'
+        elif chord_id == 1:
+            c = chords.IV(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'IV'
+        elif chord_id == 2:
+            c = chords.V(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'V'
+        elif chord_id == 3:
+            c = chords.VI(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'vi'
+        elif chord_id == 4:
+            c = chords.II(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'ii'
+        elif chord_id == 5:
+            c = chords.III(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'iii'
+        elif chord_id == 6:
+            c = chords.I7(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'I7'
+        elif chord_id == 7:
+            c = chords.II7(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'ii7'
+        elif chord_id == 8:
+            c = chords.III7(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'iii7'
+        elif chord_id == 9:
+            c = chords.IV7(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'IV7'
+        elif chord_id == 10:
+            c = chords.V7(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'V7'
+        elif chord_id == 11:
+            c = chords.VI7(key)
+            name = chords.determine(c, True, True, True)[0]
+            roman = 'vi7'
+        
+        if len(inversions) > 1:
+            n = random.choice(inversions)
+            if n == 1:
+                c = chords.first_inversion(c)
+            elif n == 2:
+                c = chords.second_inversion(c)
+
+
+        chord_numbers = [int(Note(note)) for note in c]
+        for index, number in enumerate(chord_numbers):
+                former_index = index - 1
+                if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]):
+                    chord_numbers[index] += 12
+        
+        return chord_numbers, name, roman
+    
+    def create_chord_names(key):
+        chord_names = []
+
+        chords_list = [
+            chords.I(key),
+            chords.IV(key),
+            chords.V(key),
+            chords.VI(key),
+            chords.II(key),
+            chords.III(key),
+            chords.I7(key),
+            chords.II7(key),
+            chords.III7(key),
+            chords.IV7(key),
+            chords.V7(key),
+            chords.VI7(key),
+        ]
+        if chords_included == 0:
+            n = 4
+        elif chords_included == 1:
+            n = 6
+        else:
+            n = 12
+        
+        
+        
+        for index, c in enumerate(chords_list[:n]):
+
+            chord_numbers = [int(Note(note)) for note in c]
+            for chordIndex, number in enumerate(chord_numbers):
+                    former_index = chordIndex - 1
+                    if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]):
+                        chord_numbers[chordIndex] += 12
+
+            chord_names.append({
+                'name': chords.determine(c, True, True, True)[0],
+                'roman': romans_list[index],
+                'numbers': chord_numbers
+            })
+            
+        return chord_names
+    
+    progression_obj = {}
+    chord_names_obj = {}
+    for i in range(length):
+        key = get_key()
+        
+        progression = []
+        chord_names = create_chord_names(key)
+        chord_names_obj[i] = chord_names
+        for c in range(progression_length):
+            
+            chord_id = get_chord_id()
+            if not start and not c:
+                chord_id = 0
+
+            chord_numbers, chord_name, chord_roman = generate_chord(key, chord_id)
+            chords_obj = {
+                'name': chord_name,
+                'roman': chord_roman,
+                'numbers': chord_numbers,
+            }
+            progression.append(chords_obj)
+        progression_obj[i] = progression
+
+    session['progressions'] = progression_obj
+    session['chord_names'] = chord_names_obj
+
+    return session

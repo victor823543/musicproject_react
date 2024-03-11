@@ -14,7 +14,7 @@ import mingus.core.scales as scales
 from mingus.containers import Note
 import random
 import json
-from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session
+from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session
 
 #Authentication
 @api_view(['POST'])
@@ -185,7 +185,7 @@ def get_interval(request):
 def get_chords(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        chords_included = [int(note) for note in data['chords_included']]
+        chords_included = [int(n) for n in data['chords_included']]
         style = int(data['style'])
         width = int(data['width'])
         length = int(data['length'])
@@ -198,3 +198,23 @@ def get_chords(request):
         session_object = generate_chords_session(chords_included, style, width, length, inversions)
         response = JsonResponse(session_object)
         return response
+
+@csrf_exempt
+def get_progressions(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        progressions_included = int(data['progressions_included'])
+        #style = int(data['style']) - To implement
+        start = int(data['start'])
+        length = int(data['length'])
+        progression_length = int(data['progression_length'])
+        inversions = [int(inversion) for inversion in data['inversions']]
+        if inversions:
+            inversions[0] = 0
+        else:
+            inversions = [0]
+        
+        session_object = generate_progression_session(progressions_included, start, length, progression_length, inversions)
+        response = JsonResponse(session_object)
+        return response
+

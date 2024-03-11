@@ -121,7 +121,9 @@ const Chords = () => {
                 })
             }
             setPassedChord(passed)
-        } 
+        } else {
+            refMidi.current.setMasterVolume(0.5)
+        }
         if (!(progress === Object.keys(result).length)) {
             playChord(chordSession['chords'][progress]['numbers'])
             setGuess('')

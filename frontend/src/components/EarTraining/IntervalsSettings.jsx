@@ -109,7 +109,7 @@ const IntervalsSettings = (props) => {
                         </div>
                     </div>
                     <div className='px-10 max-xs:px-4 mt-8 max-xs:mt-4'>
-                        <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Difficulty progression</h1>
+                        <h1 className='text-center text-4xl max-sm:text-3xl max-xs:text-lg font-montserrat mb-3'>Inversions</h1>
                         <div className='flex justify-center gap-4 flex-wrap'>
                             {difProgression.map((rate) => 
                                 <div key={rate} onClick={() => handleProgressionClick(rate)} className={`${(clickedProgression === rate) ? clickedColor : defaultColor} modal-btn`}>{rate}</div>
