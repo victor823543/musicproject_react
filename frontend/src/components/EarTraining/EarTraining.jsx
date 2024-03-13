@@ -1,5 +1,6 @@
 import EarTrainingHome from "./EarTrainingHome"
 import Intervals from "./Intervals"
+import Melodies from "./Melodies"
 import Chords from "./Chords"
 import Progressions from "./Progressions"
 import { useState } from 'react'
@@ -13,7 +14,7 @@ const EarTraining = () => {
         <Routes>
             <Route path="/" element={<EarTrainingHome />} />
             <Route path="/intervals" element={<Intervals />} />
-            <Route path="/melodies" element={<Intervals />} />
+            <Route path="/melodies" element={<Melodies />} />
             <Route path="/chords" element={<Chords />} />
             <Route path="/progressions" element={<Progressions />} />
         </Routes>

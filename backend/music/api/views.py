@@ -14,7 +14,7 @@ import mingus.core.scales as scales
 from mingus.containers import Note
 import random
 import json
-from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session
+from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session, generate_melodies_session
 
 #Authentication
 @api_view(['POST'])
@@ -217,4 +217,21 @@ def get_progressions(request):
         session_object = generate_progression_session(progressions_included, start, length, progression_length, inversions)
         response = JsonResponse(session_object)
         return response
+
+
+@csrf_exempt
+def get_melodies(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        notes_included = int(data['melodies_included'])
+        difficulty = int(data['difficulty'])
+        start = int(data['start'])
+        length = int(data['length'])
+        melody_length = int(data['melody_length'])
+
+        
+        session_object = generate_melodies_session(notes_included, difficulty, start, length, melody_length)
+        response = JsonResponse(session_object)
+        return response
+
 

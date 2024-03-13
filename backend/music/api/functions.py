@@ -70,10 +70,10 @@ def create_new_song(key, quality, length, additions):
     #Create chords object to send as json
     for c_list in chord_list:
         for c in c_list:
-            chord_numbers = [int(Note(note)) for note in c['chord']]
+            chord_numbers = [int(Note(note, 5)) for note in c['chord']]
             for index, number in enumerate(chord_numbers):
                 former_index = index - 1
-                if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]) or (number <= 47):
+                if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]) or (number <= 59):
                     chord_numbers[index] += 12
                 
                     
@@ -629,3 +629,70 @@ def generate_progression_session(chords_included, start, length, progression_len
     session['chord_names'] = chord_names_obj
 
     return session
+
+def generate_melodies_session(notes_included, difficulty, start, length, melody_length):
+
+    def get_numbers(notes_included=notes_included, length=melody_length, start=start, difficulty=difficulty):
+        numbers = []
+        if start:
+            numbers.append(0)
+
+        if notes_included:
+            end_index = 23
+        else:
+            end_index = 13
+        
+        for i in range(length):
+            if numbers:
+                last_number = numbers[-1]
+                max_jump = 3
+                if difficulty == 1:
+                    max_jump += 2
+                if difficulty == 2: 
+                    max_jump += 5
+
+                range_start = max(last_number - max_jump + notes_included, 0)
+                range_end = min(last_number + max_jump + notes_included, end_index)
+
+                numbers.append(random.randrange(range_start, range_end))
+            else:
+                numbers.append(random.randrange(end_index))
+        
+        return numbers
+        
+    def get_key_numbers():
+        diatonic_pattern = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29, 31, 33, 35, 36, 38, 39, 40]
+        key_numbers = []
+        key_number = random.randrange(11) + 48
+        for i in range(22):
+            if 60 <= (key_number + diatonic_pattern[i]) <= 83:
+                key_numbers.append(key_number + diatonic_pattern[i])
+        
+        key = notes.int_to_note(key_number - 48, 'b')
+        
+        return key_numbers, key
+
+    def get_melody_obj(notes_included=notes_included):
+        melody_obj = {}
+        if not notes_included:
+            key_numbers, key = get_key_numbers()
+            melody_obj['key'] = key
+            numbers = get_numbers()
+        else: 
+            key_numbers = list(range(60, 84))
+        
+
+        melody_numbers = [[key_numbers[x]] for x in numbers]
+        melody_obj['numbers'] = melody_numbers
+        melody_obj['all_notes'] = key_numbers
+
+        return melody_obj
+
+    session = {}
+    session['melodies'] = {}
+    for i in range(length):
+        melody_obj = get_melody_obj()
+        session['melodies'][i] = melody_obj
+    
+    return session
+    
