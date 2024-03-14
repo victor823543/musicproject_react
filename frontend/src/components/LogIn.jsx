@@ -22,7 +22,7 @@ const LogIn = (props) => {
         .then((data) => {
            console.log(data) 
            setInputData({username: '', password: ''})
-           props.handleAuthentication(data['token'], data['user']['username'])
+           props.handleAuthentication(data['token'], data['user']['username'], data['user']['id'])
         }) 
         .catch(err => console.log(err))
     }

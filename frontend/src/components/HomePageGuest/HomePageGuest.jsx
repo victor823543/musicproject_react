@@ -60,9 +60,9 @@ const HomePageGuest = (props) => {
                     <h1 className='text-center text-6xl max-md:text-5xl max-sm:text-4xl font-montserrat font-light text-shadow-lg shadow-white dark:text-shadow dark:shadow-sky-400 my-10'>Welcome to Learn Music</h1>
                     {
                         !showLoginPage &&
-                         <button className=' bg-slate-600/30 ring-2 ring-slate-900 rounded-lg py-2 px-4 w-44 mb-4 max-xs:mb-2 text-balance font-light max-xs:scale-75' onClick={handleLogOrCreateClick}>Log In or Create Account</button>
+                         <button className='btn-h' onClick={handleLogOrCreateClick}>Log In or Create Account</button>
                     }
-                    <button className=' bg-slate-600/30 ring-2 ring-slate-900 rounded-lg py-2 px-4 w-44 font-light max-xs:scale-75' onClick={handleGuestClick}>Continue as Guest</button>
+                    <button className='btn-h' onClick={handleGuestClick}>Continue as Guest</button>
                     </div>
                 }
                 

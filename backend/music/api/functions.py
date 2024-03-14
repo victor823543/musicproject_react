@@ -102,7 +102,7 @@ def create_new_song(key, quality, length, additions):
         for chord_index, chord in enumerate(verse):
             new_verse[chord_index] = chord
             ordered_chord_list.append(chord['name'][0])
-        song[f'verse{verse_index + 1}'] = new_verse
+        song[verse_index] = new_verse
 
     return song, chords_out, ordered_chord_list
 

@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from .serializers import UserSerializer
+from .serializers import UserSerializer, SongStorageSerializers
+from .models import SongStorage
 import mingus.core.notes as notes
 import mingus.core.intervals as intervals
 import mingus.core.chords as chords
@@ -37,6 +38,40 @@ def login(request):
     token, created = Token.objects.get_or_create(user=user)
     serializer = UserSerializer(instance=user)
     return Response({'token': token.key, 'user': serializer.data})
+
+#Database communication
+@api_view(['GET'])
+def user_songs(request, user_id):
+    try:
+        songs = SongStorage.objects.filter(user_id=user_id)
+        serializer = SongStorageSerializers(songs, many=True)
+        return Response(serializer.data)
+    except SongStorage.DoesNotExist:
+        return Response(status=404)
+
+@api_view(['POST'])
+def store_song(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+
+        serializer = SongStorageSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+def delete_song(request, user_id, song_id):
+    try:
+        user = User.objects.get(pk=user_id)
+        song = SongStorage.objects.get(pk=song_id, user=user)
+        song.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except (User.DoesNotExist, SongStorage.DoesNotExist):
+        return Response({'error': 'User or song does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 #Functionality
 @csrf_exempt      
