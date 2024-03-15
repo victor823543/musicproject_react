@@ -104,7 +104,7 @@ def create_song(request):
         if not key:
             key = random.choice(keys)
         
-        song, chords_out, ordered_chord_list = create_new_song(key, quality, length, additions)
+        song, chords_out, ordered_chord_list, chord_obj_list = create_new_song(key, quality, length, additions)
         print(ordered_chord_list)
          
     output = {
@@ -114,6 +114,7 @@ def create_song(request):
         'length': length,
         'chords': chords_out,
         'chordList': ordered_chord_list,
+        'chord_objects': chord_obj_list,
     }
 
     return JsonResponse(output)
@@ -128,6 +129,7 @@ def transpose(request):
         chords_list = {}
         ordered_chord_list = []
         interval = intervals.determine(data['oldKey'], data['key'], True)
+        interval_number = intervals.measure(data['oldKey'], data['key'])
 
         #Create transposed song
         for verse_key, verse in data['song'].items():
@@ -159,14 +161,27 @@ def transpose(request):
             #Add verse to song
             transposed_song[verse_key] = new_verse
 
+        chord_name_list = []
         #Create transposed chord list
-        for key, chord in chords_list.items():
-            chord_numbers = [int(Note(note)) for note in chord]
-            for index, number in enumerate(chord_numbers):
-                former_index = index - 1
-                if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]):
-                    chord_numbers[index] += 12
-            transposed_chords[key] = chord_numbers
+        for chord in data['chords'].values():
+            new_chord_numbers = [x + interval_number for x in chord]
+            if new_chord_numbers[0] - 12 >= 60:
+                new_chord_numbers = [x - 12 for x in new_chord_numbers]
+            
+            new_chord_names = []
+            for n in new_chord_numbers:
+                c = Note()
+                c.from_int(n)
+                new_chord_names.append(c.name)
+            print(new_chord_numbers)
+            print(new_chord_names)
+            new_key = chords.determine(new_chord_names, True)[0]
+            transposed_chords[new_key] = new_chord_numbers
+
+            chord_name_list.append(new_chord_names)
+        
+        #Create transposed chord objects list
+        new_chord_objects = [{'name': chords.determine(c, True, True, True), 'chord': c, 'root': c[0], 'addition': chords.determine(c, True, True, True)[0][len(c[0]):]} for c in chord_name_list]
 
         output = {
             'key': data['key'],
@@ -175,6 +190,7 @@ def transpose(request):
             'song': transposed_song,
             'chords': transposed_chords,
             'chordList': ordered_chord_list,
+            'chord_objects': new_chord_objects,
         }
 
         return JsonResponse(output)
