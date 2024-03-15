@@ -102,9 +102,12 @@ def create_new_song(key, quality, length, additions):
         for chord_index, chord in enumerate(verse):
             new_verse[chord_index] = chord
             ordered_chord_list.append(chord['name'][0])
-        song[f'verse{verse_index + 1}'] = new_verse
+        song[verse_index] = new_verse
+    
+    #Final ajustment to chord objects list
+    chord_obj_list = [x[0] for x in chord_list]
 
-    return song, chords_out, ordered_chord_list
+    return song, chords_out, ordered_chord_list, chord_obj_list
 
 def generate_numbers(place, quality):
     #For place: 0=Beginning verse, 1=Middle verse, 2=Ending verse

@@ -6,9 +6,9 @@ import MusicPageForm from './MusicPageForm'
 import MusicPageOptions from './MusicPageOptions'
 import MusicPageKeyboard from './MusicPageKeyboard'
 import MusicPageAudio from './MusicPageAudio'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const MusicPage = () => {
+const MusicPage = (props) => {
     const [params, setParams] = useState({ key: '', quality: 'Major', length: '1', additions: null})
     const [song, setSong] = useState(null)
     const [showChord, setShowChord] = useState([0])
@@ -17,8 +17,14 @@ const MusicPage = () => {
     const [audioTempo, setAudioTempo] = useState(2)
     const [showModal, setShowModal] = useState(false)
     const [showAudioModal, setShowAudioModal] = useState(false)
+    const [editMode, setEditMode] = useState(false)
+    const [chordReplacements, setChordReplacements] = useState(null)
 
-
+    useEffect(() => {
+        if (props.sentSong) {
+            setSong(props.sentSong)
+        }
+    }, [])
 
     const fetchCreateSong = (paramsOut=params) => {
         const url = new URL('http://localhost:8000/api/create/')
@@ -113,6 +119,46 @@ const MusicPage = () => {
         
     }
 
+    const fetchStoreSong = () => {
+        const url = new URL(`http://localhost:8000/api/users/${props.user['user_id']}/store/`)
+
+        const headers = new Headers({
+            'Content-Type': 'application/json',
+        })
+
+        const dataToSend = {
+            'song': song,
+        }
+
+        const options = {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(dataToSend)
+        }
+
+        fetch(url, options)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+            })
+            .catch(error => console.error('Error:', error))
+    }
+
+    const changeChord = (targetVerse, targetChord, newChord) => {
+        setSong((prev) => {
+            const newSongObj = {
+                ...prev['song'],
+            }
+            newSongObj[targetVerse][targetChord] = song['chord_objects'][newChord]
+
+            return {...prev, 'song': newSongObj}
+        })
+    }
+
+    const handleEditClick = () => {
+        setEditMode(!editMode)
+    }
+
     const handleSelectKeyChange = (e) => {
         setParams((prev) => {
             return ({
@@ -159,7 +205,19 @@ const MusicPage = () => {
     }
 
     const handleChordClick = (c) => {
-        setShowChord(song['chords'][c])
+        if (!editMode) {
+            setShowChord(song['chords'][c])
+        } else {
+            const chords = []
+            for (let i=0; i<song['chord_objects'].length; i++) {
+                if (!(song['chord_objects'][i]['name'][0] === c[0])) {
+                    chords.push(song['chord_objects'][i])
+                } else {
+                    chords.push(null)
+                }
+            }
+            setChordReplacements(chords)
+        }
     }
 
     const handleProgress = state => {
@@ -192,12 +250,16 @@ const MusicPage = () => {
                 /> }
                 {song && 
                 <>
+                {editMode &&
+                    <div className='absolute top-0 left-0 inset-0 w-full h-full bg-zinc-800 bg-opacity-50 z-10 pt-20 pb-4'></div>
+                }
                 {/* For bigger than sm device width */}
                 <div className='w-full h-full flex max-lg:flex-col max-sm:hidden mt-28 mb-6 dark:text-teal-200/80'>
                     <div className='w-full h-20 lg:hidden'></div>
                     <div className='absolute w-full h-full bg-zinc-200 inset-0 -z-20'></div>
                     <div className='lg:w-1/2 h-full flex flex-col justify-between'>
-                        <MusicPageChords song={song} handleChordClick={handleChordClick} chordPlaying={chordPlaying}/>
+                        <MusicPageChords song={song} handleChordClick={handleChordClick} chordPlaying={chordPlaying} changeChord={changeChord} editMode={editMode} handleEditClick={handleEditClick} chordReplacements={chordReplacements}/>
+                        {props.isAuthenticated && <button onClick={fetchStoreSong} className='btn-s w-fit mx-auto mb-2 relative bottom-5'>Store Song</button>}
                         <MusicPageOptions song={song} handleCreateClick={handleCreateNewClick} handleTransposeClick={handleTransposeClick}/>
                     </div>
                     <div className='lg:w-1/2'>
@@ -235,7 +297,7 @@ const MusicPage = () => {
 
                         
 
-                        <MusicPageChords song={song} handleChordClick={handleChordClick} chordPlaying={chordPlaying}/>
+                        <MusicPageChords song={song} handleChordClick={handleChordClick} chordPlaying={chordPlaying} changeChord={changeChord}/>
                         <div className='flex justify-center'>
                             <button className='btn-s w-fit' onClick={toggleModal}>Change song</button>
                         </div>
