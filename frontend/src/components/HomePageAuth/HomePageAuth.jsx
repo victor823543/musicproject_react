@@ -2,14 +2,37 @@ import image_dark_grand from '../../assets/images/dark_grand.jpeg'
 import image_white_grand from '../../assets/images/white_grand.jpeg'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { BarChart } from '@tremor/react'
 
 const HomePageAuth = (props) => {
     const navigate = useNavigate()
     const [songs, setSongs] = useState([])
     const [editMode, setEditMode] = useState(false)
     const [updateUI, setUpdateUI] = useState(false)
+    const [stats, setStats] = useState(null)
+    const [charts, setCharts] = useState(null)
 
     useEffect(() => {
+        const fetchStats = () => {
+            const url = new URL(`http://localhost:8000/api/userstats/${props.user['user_id']}/`)
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    const newStats = {
+                        'intervalSessionStats': data.intervalSessionStats,
+                        'intervalProgressStats': data.intervalProgressStats,
+                    }
+                    setStats(newStats)
+                    const newCharts = {
+                        'intervalChart': data.intervalChart,
+                    }
+                    setCharts(newCharts)
+                })
+                .catch(error => console.error('Error', error))
+        }
+
         const fetchSongs = () => {
             const url = new URL(`http://localhost:8000/api/users/${props.user['user_id']}/songs`)
 
@@ -21,6 +44,8 @@ const HomePageAuth = (props) => {
                 })
                 .catch(error => console.error('Error:', error))
         }
+
+        fetchStats()
         fetchSongs()
         props.cancelSong()
     }, [updateUI])
@@ -47,8 +72,12 @@ const HomePageAuth = (props) => {
         setEditMode(!editMode)
     }
 
+    const dataFormatter = (number) =>
+    Intl.NumberFormat('us').format(number).toString()
+
     return (
-        <div className='h-screen w-screen flex flex-col justify-center items-center dark:text-slate-300 overflow-hidden'>
+        <div className='h-screen w-screen flex flex-col items-center dark:text-slate-300'>
+            <div className='w-full min-h-20 bg-transparent'></div>
             <div style={{backgroundImage: `url(${image_white_grand})`}} className='dark:hidden fixed bg-cover inset-0 bg-center -z-20 '></div>
             <div style={{backgroundImage: `url(${image_dark_grand})`}} className='dark:block hidden fixed bg-cover inset-0 bg-center -z-20 '></div>
             <div className=' fixed bg-cover inset-0 -z-10 backdrop-blur-md'></div>
@@ -97,9 +126,25 @@ const HomePageAuth = (props) => {
                            
                     
                 </div>
-                
-
-                
+            </div>
+            <div className='w-full'>
+                <h1 className='text-center font-montserrat text-2xl mt-8'>Eartraining stats</h1>
+                <div className='w-full px-6'>
+                    <BarChart 
+                        className='mt-6'
+                        data={charts?.intervalChart}
+                        index='name'
+                        categories={[
+                            'total',
+                            'correct',
+                            'wrong',
+                        ]}
+                        colors={['slate-700', 'green-500', 'red-500']}
+                        valueFormatter={dataFormatter}
+                        yAxisWidth={48}
+                        showAnimation
+                    />
+                </div>
             </div>
         </div>
     )

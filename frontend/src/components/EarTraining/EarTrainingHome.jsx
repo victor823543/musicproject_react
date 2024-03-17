@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 const EarTrainingHome = () => {
     const navigate = useNavigate()
-    const [selected, setSelected] = useState(3)
+    const [selected, setSelected] = useState(0)
 
     const handleMouseOver = (section) => {
         setSelected(section)
@@ -26,8 +26,8 @@ const EarTrainingHome = () => {
                         <p className="font-montserrat font-light text-center text-pretty">Practice freely with your own settings</p>
                     </div>
                     <div className="flex flex-col items-center skew-x-12 px-16">
-                        <button className="btn-e mb-2 bg-blue-200/60 ring-blue-800 dark:bg-blue-950 dark:ring-blue-500">Guided learning</button>
-                        <p className="font-montserrat font-light text-center text-pretty">Learn with our prearranged plan</p>
+                        <button onClick={() => navigate('/eartraining/intervals/progress-mode')} className="btn-e mb-2 bg-blue-200/60 ring-blue-800 dark:bg-blue-950 dark:ring-blue-500">Progress mode</button>
+                        <p className="font-montserrat font-light text-center text-pretty">Learn with automated progress</p>
                     </div>
                 </div>
             </section>

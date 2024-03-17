@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react'
 function App() {
   const navigate = useNavigate()
   const [authToken, setAuthToken] = useState(null)
-  const [user, setUser] = useState({'username': '', 'user_id': null})
+  const [user, setUser] = useState({'username': localStorage.getItem('username'), 'user_id': localStorage.getItem('user_id')})
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [song, setSong] = useState(null)
   
@@ -84,7 +84,7 @@ useEffect(() => {
         }/>
         <Route path='/music' element={<MusicPage token={authToken} user={user} isAuthenticated={isAuthenticated} sentSong={song}/>} />
         <Route path='/eartraining/*' element={
-          <EarTraining />
+          <EarTraining user={user}/>
         } />
         
       </Routes>

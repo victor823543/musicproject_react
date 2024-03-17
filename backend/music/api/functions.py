@@ -8,7 +8,7 @@ from midi2audio import FluidSynth
 from pydub import AudioSegment
 import tempfile
 import random
-import copy
+import copy, math
 
 Soundfonts = ['api/static/soundfonts/NY_Steinway_Model_D.sf2']
 SOUNDFONT = Soundfonts[0]
@@ -343,7 +343,7 @@ def new_base(song, variation):
 
 
 #Create interval session
-def generate_interval_session(intervals_included, directions, width, length, progression_rate):
+def generate_interval_session(intervals_included, directions, width, length):
     interval_names = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
     if width == 0:
         starting_note = 60
@@ -360,13 +360,19 @@ def generate_interval_session(intervals_included, directions, width, length, pro
         root = random.randrange(starting_note, starting_note + scope_length)
         interval = []
         interval_obj = {}
-        if 'Up' in directions:
+        if 'Random' in directions:
+            direction_choice = directions[:]
+            direction_choice.remove('Random')
+            temp_directions = [random.choice(direction_choice)]
+        else:
+            temp_directions = directions[:]
+        if 'Up' in temp_directions:
             interval.append([root])
             interval.append([root + interval_number])
-        if 'Down' in directions:
+        if 'Down' in temp_directions:
             interval.append([root])
             interval.append([root - interval_number])
-        if 'Unison' in directions:
+        if 'Unison' in temp_directions:
             interval.append([root, root + interval_number])
         interval_obj['numbers'] = interval
         interval_obj['name'] = interval_names[interval_number - 1]
@@ -374,9 +380,91 @@ def generate_interval_session(intervals_included, directions, width, length, pro
     
     session = {
         'intervals': intervals,
-        'progression_rate': progression_rate,
     }
     
+    return session
+
+def generate_interval_progress_session(progress, infoOnly=False):
+    interval_names = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
+    if 0 <= progress <= 9:
+        directions = ['Up']
+        width = 0
+        length = 10
+    if 10 <= progress <= 19:
+        intervals_included = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        directions = ['Up']
+        width = 1
+        length = 10
+    if 20 <= progress:
+        intervals_included = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        directions = ['Up', 'Down', 'Unison', 'Random']
+        width = 1
+        length = 10
+    if progress == 0:
+        intervals_included = [5, 7, 12]
+    if progress == 1:
+        intervals_included = [2, 4, 12]
+    if 2 <= progress <=3:
+        intervals_included = [2, 4, 5, 7, 12]
+    if progress == 3:
+        width = 1
+    if progress == 4:
+        intervals_included = [9, 11]
+    if 5 <= progress <= 6: 
+        intervals_included = [2, 4, 5, 7, 9, 11, 12]
+    if progress == 6:
+        width = 2
+        length = 20
+    if progress == 7:
+        intervals_included = [1, 3, 6, 8]
+    if progress == 8:
+        intervals_included = [10, 11]
+    if progress == 9:
+        intervals_included = [8, 9, 10, 11]
+    if progress == 10:
+        length = 20
+    if progress == 11:
+        directions.append('Down')
+    if 12 <= progress <= 15:
+        directions = ['Down']
+    if progress == 12:
+        intervals_included = [2, 4, 5, 7]
+    if progress == 13:
+        intervals_included = [2, 4, 5, 7, 9, 11, 12]
+    if progress == 14:
+        intervals_included = [1, 3, 8, 9, 10, 11]
+    if progress == 15:
+        length = 20
+    if progress == 16:
+        directions.append('Unison')
+        length = 20
+    if 17 <= progress <= 19:
+        directions = ['Unison']
+    if progress == 17:
+        intervals_included = [2, 4, 5, 7]
+    if progress == 18:
+        intervals_included = [1, 3, 8, 9, 10, 11]
+    if progress == 19:
+        length = 20
+    if progress == 21:
+        length = 20
+        width = 2
+    if progress == 22:
+        length = 50
+        width = 2
+    
+    if infoOnly:
+        session = {}
+    else:
+        session = generate_interval_session(intervals_included, directions, width, length)
+    interval_names = [interval_names[x - 1] for x in intervals_included]
+    session['interval_names'] = interval_names
+    session['length'] = length
+    session['directions'] = directions
+    width_names = ['4', '3-5', '2-6']
+    session['width'] = width_names[width]
+    session['level'] = progress + 1
+    session['totalProgress'] = round(((progress) / 23) * 100)
     return session
 
 def generate_chords_session(chords_included, style, width, length, inversions):
@@ -699,3 +787,43 @@ def generate_melodies_session(notes_included, difficulty, start, length, melody_
     
     return session
     
+
+#Create stats objects
+
+def create_interval_stats_object():
+    progressLength = 23
+    progressStats = {}
+    for i in range(progressLength):
+        info = generate_interval_progress_session(i, infoOnly=True)
+        progressObject = {
+            'bestScore': 0,
+            'bestScorePercent': 0,
+            'info': info,
+        }
+        progressStats[i + 1] = progressObject
+    
+    interval_names = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
+    sessionStats = {}
+    for interval in interval_names:
+        sessionObject = {
+            'total': 0,
+            'correct': 0,
+            'percent': 0,
+        }
+        sessionStats[interval] = sessionObject
+
+
+    return sessionStats, progressStats
+
+#Create chartdata
+def create_chartdata(intervalSessionStats):
+    intervalSessionChart = [
+        {
+            'name': intervalName,
+            'total': value['total'],
+            'correct': value['correct'],
+            'wrong': value['total'] - value['correct'],
+        } for intervalName, value in intervalSessionStats.items()
+    ]
+
+    return intervalSessionChart

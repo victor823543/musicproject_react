@@ -1,10 +1,10 @@
 import { useRef, useState, useEffect } from 'react'
+import { ProgressCircle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react'
 import MIDISounds from 'midi-sounds-react'
-import IntervalsSettings from './IntervalsSettings'
 import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
 
-const Intervals = (props) => {
+const IntervalProgress = (props) => {
     const refMidi = useRef()
     const [currentSettings, setCurrentSettings] = useState({})
     const [showStart, setShowStart] = useState(true)
@@ -18,9 +18,12 @@ const Intervals = (props) => {
     const [isFinished, setIsFinished] = useState(false)
     const [stats, setStats] = useState({})
     const [storedStats, setStoredStats] = useState(null)
-    const [totalCompleted, setTotalCompleted] = useState(0)
     const [passedInterval, setPassedInterval] = useState({'name': '', 'correct': true, 'visible': false, 'triggered': true})
     const [textVisible, setTextVisible] = useState(false)
+
+    useEffect(() => {
+        fetchSession()
+    }, [])
 
     useEffect(() => {
         if (!passedInterval['triggered']) {
@@ -39,58 +42,41 @@ const Intervals = (props) => {
     const defaultColor = 'bg-slate-200/40 dark:bg-slate-500/20'
     const clickedColor = 'bg-blue-500/30 dark:bg-sky-400/30'
 
+    const fetchSession = () => {
+        const url = new URL(`http://localhost:8000/api/interval/progress/${props.user['user_id']}/`)
 
-    const fetchIntervalSession = (paramsOut) => {
-        setCurrentSettings(paramsOut)
-        setIntervalNames(paramsOut['interval_names'])
-
-        const resObj = Object.fromEntries(
-                Array.from({ length: parseInt(paramsOut['length']) }, (_, index) => [index, 0])
-                )
-        setResult(resObj)
-
-        const url = new URL('http://localhost:8000/api/interval/')
-
-        const headers = new Headers({
-            'Content-Type': 'application/json',
-        })
-
-        const dataToSend = {
-            'intervals': paramsOut['intervals'],
-            'directions': paramsOut['directions'],
-            'width': paramsOut['width'],
-            'length': paramsOut['length'],
-            'progression': paramsOut['progression'],
-        }
-
-        const options = {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(dataToSend)
-        }
-
-        fetch(url, options)
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 console.log(data)
-                
+                setIntervalNames(data['interval_names'])
                 setIntervalSession(data)
-                
+                setResult(Object.fromEntries(
+                    Array.from({ length: parseInt(data['length']) }, (_, index) => [index, 0])
+                    ))
             })
             .catch(error => console.error('Error:', error))
-
     }
 
-    const fetchUpdateStats = (intervalStats) => {
+    const fetchUpdateProgress = () => {
+        const url = new URL(`http://localhost:8000/api/interval/progress/update/${props.user['user_id']}/`)
+            fetch(url)
+                .then(response => 
+                        console.log(response)
+                    )
+                .catch(error => console.error('Error:', error))
+    }
+
+    const fetchUpdateStats = (intervalStats, progressStats) => {
         const interval_length = Object.keys(intervalSession['intervals']).length
-        const paramsOut = {}
+        const sessionStats = {}
         intervalNames.forEach(interval => {
-            paramsOut[interval] = {'correct': 0, 'total': 0} 
+            sessionStats[interval] = {'correct': 0, 'total': 0} 
         })
         for (let i=0; i<interval_length; i++) {
-            paramsOut[intervalSession['intervals'][i]['name']]['total'] += 1
+            sessionStats[intervalSession['intervals'][i]['name']]['total'] += 1
             if (intervalStats[i] === 1) {
-                paramsOut[intervalSession['intervals'][i]['name']]['correct'] += 1
+                sessionStats[intervalSession['intervals'][i]['name']]['correct'] += 1
             }
             
         }
@@ -103,8 +89,8 @@ const Intervals = (props) => {
 
         const dataToSend = {
             'type': 'interval',
-            'sessionStats': paramsOut,
-            'progressStats': null,
+            'sessionStats': sessionStats,
+            'progressStats': progressStats,
         }
 
         const options = {
@@ -119,8 +105,7 @@ const Intervals = (props) => {
 
     }
 
-    const handleStartClick = (params) => {
-        fetchIntervalSession(params)
+    const handleStartClick = () => {
         setShowStart(false)
         setShowMain(true)
     }
@@ -189,7 +174,14 @@ const Intervals = (props) => {
             }
             var finalScore = score
         }
-        fetchUpdateStats(finalResult)
+
+        //Update user stats
+        const progressStats = {
+            'result': finalScore,
+            'level': intervalSession?.level
+        }
+        fetchUpdateStats(finalResult, progressStats)
+
         getStats(finalScore, finalResult)
         setProgress(0)
         setGuess('')
@@ -227,7 +219,13 @@ const Intervals = (props) => {
         
         const sessionStats = {
             'correct': finalScore,
-            'total': interval_length + totalCompleted,
+            'total': interval_length,
+            'percent': Math.ceil((finalScore / interval_length) * 100),
+            'moveOn': Math.ceil((finalScore / interval_length) * 100) >= 100,
+        }
+
+        if (sessionStats.moveOn) {
+            fetchUpdateProgress()
         }
 
         setStats({
@@ -236,34 +234,15 @@ const Intervals = (props) => {
         })
 
         setStoredStats(intervalStats)
-
-        setTotalCompleted(sessionStats['total'])
     }
 
-    const handleExtendClick = (newSettings) => {
-        if (newSettings) {
-            setShowMain(false)
-            setShowStart(true)
-            setIsFinished(false)
-        } else {
-            fetchIntervalSession(currentSettings)
-            setIsFinished(false)
-        }
-    }
-
-    const handleRestartClick = (newSettings) => {
-        if (newSettings) {
+    const handleRestartClick = () => {
             setScore(0)
             setStoredStats(null)
             setShowMain(false)
             setShowStart(true)
             setIsFinished(false)
-        } else {
-            setScore(0)
-            setStoredStats(null)
-            fetchIntervalSession(currentSettings)
-            setIsFinished(false)
-        }
+            fetchSession()
     }
 
 
@@ -308,7 +287,55 @@ const Intervals = (props) => {
         <div className='fixed bg-cover inset-0 -z-40 bg-white dark:bg-black'></div>
 
         {showStart &&
-            <IntervalsSettings handleStartClick={handleStartClick} />
+            <div className='fixed inset-0 cover bg-slate-700/40 flex flex-col justify-center items-center dark:text-sky-200/80'>
+                <div className='bg-zinc-200 dark:bg-slate-950 p-20 flex flex-col gap-10 items-center rounded-xl shadow-xl'>
+                    <h1 className='font-montserrat text-3xl text-center'>Progress mode</h1>
+                    <div className='flex gap-10'>
+                        <div className='flex flex-col items-center gap-3'>
+                            <h2 className='font-montserrat text-xl'>Total progress</h2>
+                            <ProgressCircle value={intervalSession?.totalProgress} size="lg" showAnimation>
+                                <span className="text-sm font-medium font-montserrat text-slate-700">{`${intervalSession?.totalProgress}%`}</span>
+                            </ProgressCircle>
+                        </div>
+                        <div className='flex flex-col items-center gap-3'>
+                            <h2 className='font-montserrat text-xl'>Session progress</h2>
+                            <ProgressCircle value={intervalSession?.sessionBest} size="lg" showAnimation>
+                                <span className="text-sm font-medium font-montserrat text-slate-700">{`${intervalSession?.sessionBest}%`}</span>
+                            </ProgressCircle>
+                        </div>
+                    </div>
+                    <h2 className='font-montserrat text-2xl text-center mt-5'>{`Current session - ${intervalSession?.level}`}</h2>
+                    <div className='flex gap-10'>
+                        <div className='flex flex-col items-center'>
+                            <h3>Session information</h3>
+                            <TabGroup>
+                                <TabList variant='line'>
+                                    <Tab value={1}>Intervals</Tab>
+                                    <Tab value={2}>Directions</Tab>
+                                    <Tab value={3}>Octaves</Tab>
+                                    <Tab value={4}>Length</Tab>
+                                </TabList>
+                                <TabPanels>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalNames.map((name) => `${name}, `)}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalSession?.directions.map((direction) => `${direction}, `)}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalSession?.width}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalSession?.length}</p>
+                                    </TabPanel>
+                                </TabPanels>
+                            </TabGroup>
+                        </div>
+
+                    </div>
+                    <button onClick={handleStartClick} className='py-2 px-4 bg-blue-600/30 ring-2 ring-blue-800 dark:ring-sky-400 rounded-sm font-montserrat'>Start current session</button>
+                </div>
+            </div>
         }
 
         {showMain && 
@@ -348,17 +375,22 @@ const Intervals = (props) => {
                         <h1 className='text-3xl font-montserrat text-center mb-5'>Good job</h1>
                         <p>{`Your score: ${stats['sessionStats']['correct']}/${stats['sessionStats']['total']}`}</p>
                         <h1 className='text-3xl font-montserrat text-center'>Your session stats</h1>
-                        <div className='grid grid-cols-3 max-sm:grid-cols-2 max-xs:grid-cols-1 gap-x-16 gap-y-4 px-6 '>
-                            {Object.entries(stats['intervalStats']).map(([interval, obj]) => 
-                                <p key={interval}>{`${interval}: ${obj['correct']}/${obj['total']}`}</p>
-                            )}
+                        <div className='flex'>
+                            <div className='grid grid-cols-3 max-sm:grid-cols-2 max-xs:grid-cols-1 gap-x-16 gap-y-4 px-6 '>
+                                {Object.entries(stats['intervalStats']).map(([interval, obj]) => 
+                                    <p key={interval}>{`${interval}: ${obj['correct']}/${obj['total']}`}</p>
+                                )}
+                            </div>
+                            <div className='flex flex-col items-center gap-3'>
+                                <h2 className='font-montserrat text-xl'>Session progress</h2>
+                                <ProgressCircle value={stats['sessionStats']['percent']} size="lg">
+                                    <span className="text-sm font-medium font-montserrat text-slate-700">{`${stats['sessionStats']['percent']}%`}</span>
+                                </ProgressCircle>
+                            </div>
                         </div>
-                        <div className='grid grid-cols-2 gap-2 px-2'>
-                            <button onClick={() => handleRestartClick(false)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Restart session</button>
-                            <button onClick={() => handleRestartClick(true)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Restart with new settings</button>
-                            <button onClick={() => handleExtendClick(false)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Extend session</button>
-                            <button onClick={() => handleExtendClick(true)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Extend with new settings</button>
-                        </div>
+                        
+                        <button onClick={handleRestartClick} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>{stats.sessionStats['moveOn'] ? 'Next session' : 'Try again'}</button>
+                            
                         
                     </div>
                 </div>
@@ -370,4 +402,4 @@ const Intervals = (props) => {
   )
 }
 
-export default Intervals
+export default IntervalProgress
