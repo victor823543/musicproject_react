@@ -792,7 +792,7 @@ def generate_melodies_session(notes_included, difficulty, start, length, melody_
 
 def create_interval_stats_object():
     progressLength = 23
-    progressStats = {}
+    progressLevelStats = {}
     for i in range(progressLength):
         info = generate_interval_progress_session(i, infoOnly=True)
         progressObject = {
@@ -800,7 +800,15 @@ def create_interval_stats_object():
             'bestScorePercent': 0,
             'info': info,
         }
-        progressStats[i + 1] = progressObject
+        progressLevelStats[i + 1] = progressObject
+    progressStats = {
+        'levelStats': progressLevelStats,
+        'totalStats': {
+                'completed': 0,
+                'goal': progressLength,
+                'progressPercent': 0,
+        }
+    }
     
     interval_names = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
     sessionStats = {}
@@ -815,6 +823,29 @@ def create_interval_stats_object():
 
     return sessionStats, progressStats
 
+def update_stats(eartrainingType, session, progress, newSessionStats, newProgressStats): 
+
+    if eartrainingType == 'interval':
+        if session:
+            print('Came to session')
+            for interval, result in session.items():
+                newSessionStats[interval]['total'] += int(result['total'])
+                newSessionStats[interval]['correct'] += int(result['correct'])
+                if newSessionStats[interval]['total']:
+                    newSessionStats[interval]['percent'] = round((int(newSessionStats[interval]['correct']) / int(newSessionStats[interval]['total'])) * 100)
+                else:
+                    newSessionStats[interval]['percent'] = 0
+        if progress:
+            level = str(progress['level'])
+            newProgressStats['levelStats'][level]['bestScore'] = max(int(newProgressStats['levelStats'][level]['bestScore']), int(progress['result']))
+            newProgressStats['levelStats'][level]['bestScorePercent'] = round((int(newProgressStats['levelStats'][level]['bestScore']) / int(newProgressStats['levelStats'][level]['info']['length'])) * 100)
+            total_completed = count_key_value_pairs(newProgressStats['levelStats'], 'bestScorePercent', 100)
+            total_progress = round((total_completed / 23) * 100)
+            newProgressStats['totalStats']['completed'] = total_completed
+            newProgressStats['totalStats']['progressPercent'] = total_progress
+
+    return newSessionStats, newProgressStats
+
 #Create chartdata
 def create_chartdata(intervalSessionStats):
     intervalSessionChart = [
@@ -827,3 +858,11 @@ def create_chartdata(intervalSessionStats):
     ]
 
     return intervalSessionChart
+
+#Unrelated functions
+def count_key_value_pairs(dct, target_key, target_value):
+    count = 0
+    for inner_dct in dct.values():
+        if target_key in inner_dct and inner_dct[target_key] == target_value:
+            count += 1
+    return count

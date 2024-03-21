@@ -15,7 +15,7 @@ import mingus.core.scales as scales
 from mingus.containers import Note
 import random
 import json
-from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session, generate_melodies_session, generate_interval_progress_session, create_interval_stats_object, create_chartdata
+from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session, generate_melodies_session, generate_interval_progress_session, create_interval_stats_object, create_chartdata, update_stats
 
 #Authentication
 @api_view(['POST'])
@@ -78,14 +78,17 @@ def delete_song(request, user_id, song_id):
 def get_user_stats(request, user_id):
     try:
         intervalStats = UserStats.objects.get(user_id=user_id, type='interval')
-        
         intervalChart = create_chartdata(intervalStats.sessionStats)
-        user_stats = {
+        userProgress, created = UserProgress.objects.get_or_create(user_id=user_id)
+        currentLevel = str(userProgress.intervalProgress + 1)
+        user_stats_interval = {
                     'intervalSessionStats': intervalStats.sessionStats,
                     'intervalProgressStats': intervalStats.progressStats,
+                    'currentLevel': currentLevel,
                     'intervalChart': intervalChart
                 }
-        return JsonResponse(user_stats)
+        
+        return JsonResponse(user_stats_interval)
     except UserStats.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -103,6 +106,8 @@ def update_user_stats(request, user_id):
     eartrainingType = data['type']
     stats, created = UserStats.objects.get_or_create(user_id=user_id, type=eartrainingType)
     print(created)
+
+    
     if data['type'] == 'interval': #Interval
         if created:
             newSessionStats, newProgressStats = create_interval_stats_object()
@@ -112,22 +117,10 @@ def update_user_stats(request, user_id):
             newSessionStats = stats.sessionStats
             newProgressStats = stats.progressStats
 
-        if session:
-            print('Came to session')
-            for interval, result in session.items():
-                newSessionStats[interval]['total'] += int(result['total'])
-                newSessionStats[interval]['correct'] += int(result['correct'])
-                if newSessionStats[interval]['total']:
-                    newSessionStats[interval]['percent'] = round((int(newSessionStats[interval]['correct']) / int(newSessionStats[interval]['total'])) * 100)
-                else:
-                    newSessionStats[interval]['percent'] = 0
-            stats.sessionStats = newSessionStats
-        if progress:
-            level = str(progress['level'])
-            newProgressStats[level]['bestScore'] = max(int(newProgressStats[level]['bestScore']), int(progress['result']))
-            newProgressStats[level]['bestScorePercent'] = round((int(newProgressStats[level]['bestScore']) / int(newProgressStats[level]['info']['length'])) * 100)
-            stats.progressStats = newProgressStats
-    
+        updatedSessionStats, updatedProgressStats = update_stats(eartrainingType, session, progress, newSessionStats, newProgressStats)
+        stats.sessionStats = updatedSessionStats
+        stats.progressStats = updatedProgressStats
+        
     stats.save()
 
     status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
@@ -307,7 +300,7 @@ def get_interval_progress_mode(request, user_id):
         try:
             stats = UserStats.objects.get(user_id=user_id, type='interval')
             progressObject = stats.progressStats
-            sessionBest = progressObject[str(progress + 1)]['bestScorePercent']
+            sessionBest = progressObject['levelStats'][str(progress + 1)]['bestScorePercent']
         except UserStats.DoesNotExist:
             progressObject = None
             sessionBest = 0

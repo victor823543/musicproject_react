@@ -3,10 +3,10 @@ import { ProgressCircle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tr
 import MIDISounds from 'midi-sounds-react'
 import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
+import FullProgress from './FullProgress'
 
 const IntervalProgress = (props) => {
     const refMidi = useRef()
-    const [currentSettings, setCurrentSettings] = useState({})
     const [showStart, setShowStart] = useState(true)
     const [showMain, setShowMain] = useState(false)
     const [intervalSession, setIntervalSession] = useState(null)
@@ -19,7 +19,7 @@ const IntervalProgress = (props) => {
     const [stats, setStats] = useState({})
     const [storedStats, setStoredStats] = useState(null)
     const [passedInterval, setPassedInterval] = useState({'name': '', 'correct': true, 'visible': false, 'triggered': true})
-    const [textVisible, setTextVisible] = useState(false)
+    const [showAll, setShowAll] = useState(false)
 
     useEffect(() => {
         fetchSession()
@@ -305,6 +305,7 @@ const IntervalProgress = (props) => {
                         </div>
                     </div>
                     <h2 className='font-montserrat text-2xl text-center mt-5'>{`Current session - ${intervalSession?.level}`}</h2>
+                    <button onClick={() => setShowAll(true)} className='py-2 px-4 bg-blue-600/30 ring-2 ring-blue-800 dark:ring-sky-400 rounded-sm font-montserrat'>Show all sessions</button>
                     <div className='flex gap-10'>
                         <div className='flex flex-col items-center'>
                             <h3>Session information</h3>
@@ -396,6 +397,10 @@ const IntervalProgress = (props) => {
                 </div>
                 
             </div>
+        }
+
+        {showAll &&
+            <FullProgress levelStats={intervalSession?.progressInfo.levelStats} current={intervalSession?.level} close={() => setShowAll(false)}/>
         }
         
     </div>
