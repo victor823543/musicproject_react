@@ -77,8 +77,8 @@ const EarTrainingHome = () => {
                         <p className="font-montserrat font-light text-center text-pretty">Practice freely with your own settings</p>
                     </div>
                     <div className="flex flex-col items-center skew-x-12 px-16">
-                        <button className="btn-e mb-2 bg-fuchsia-200/60 ring-fuchsia-700 dark:bg-violet-950 dark:ring-fuchsia-500">Guided learning</button>
-                        <p className="font-montserrat font-light text-center text-pretty">Learn with our prearranged plan</p>
+                        <button onClick={() => navigate('/eartraining/progressions/progress-mode')} className="btn-e mb-2 bg-fuchsia-200/60 ring-fuchsia-700 dark:bg-violet-950 dark:ring-fuchsia-500">Guided learning</button>
+                        <p className="font-montserrat font-light text-center text-pretty">Learn with automated progress</p>
                     </div>    
                 </div>       
             </section>

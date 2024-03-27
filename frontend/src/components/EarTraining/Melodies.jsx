@@ -194,10 +194,10 @@ const Melodies = () => {
         
     const atFinish = () => {
         const current = progress - 1
-
+        console.log(current)
         let finalNoteScore = noteScore
         let correctAmmount = 0
-            for (let i=0; 0>melodyLength; i++) {
+            for (let i=0; i < melodyLength; i++) {
                 if (guess[i] === melodySession['melodies'][current]['numbers'][i][0]) {
                     correctAmmount++
                     finalNoteScore++

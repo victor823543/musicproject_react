@@ -6,7 +6,14 @@ const FullProgress = (props) => {
     const [showLevel, setShowLevel] = useState(props.current)
 
     const intervalNames = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
-    const numRows = 8
+    const chordRomans = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'I7', 'ii7', 'iii7', 'IV7', 'V7', 'vi7']
+    const indexToChords = {
+        'Basic': [0, 3, 4, 5],
+        'All diatonic': [0, 1, 2, 3, 4, 5],
+        '+ seventh': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    }
+    const inversions = ['First inversion', 'Second inversion']
+    const numRows = Math.ceil(Object.keys(props.levelStats).length / 3)
     const numCols = 3
 
 
@@ -29,7 +36,7 @@ const FullProgress = (props) => {
                                         var displayHorizontal = 'border-b-2 border-black dark:border-amber-200'
                                     }
                                     //Hide or show line depending on position - vertical
-                                    if (colIndex == numCols - 1) {
+                                    if ((colIndex == numCols - 1) && !(rowIndex + 1 === numRows && colIndex + 1 === numCols)) {
                                         var displayVertical = 'border-r-2 border-black dark:border-amber-200'
                                     }
 
@@ -41,11 +48,17 @@ const FullProgress = (props) => {
                                                     <p className='text-center'>{`Level ${item.info.level}`}</p>
                                                     <div className='flex gap-x-4 flex-wrap'>
                                                         <p className='text-sm font-light'>{`Length: ${item.info.length}`}</p>
-                                                        <p className='text-sm font-light'>{`Width: ${item.info.width}`}</p>
+                                                        {props.type === 'interval' && <p className='text-sm font-light'>{`Width: ${item.info?.width}`}</p>}
+                                                        {props.type === 'progression' && <p className='text-sm font-light'>{`Progression length: ${item.info?.progression_length}`}</p>}
+                                                        {props.type === 'progression' && <p className='text-sm font-light'>{`${item.info?.start}`}</p>}
                                                     </div>
                                                     <div className='flex gap-3'>
-                                                        <p className='text-sm'>Directions:</p>
-                                                        <p className='text-sm font-light'>{item.info.directions.map((direction, index) => index === item.info.directions.length - 1 ? direction : ` ${direction} - `)}</p>
+                                                        {props.type === 'interval' &&
+                                                        <>
+                                                            <p className='text-sm'>Directions:</p>
+                                                            <p className='text-sm font-light'>{item.info?.directions.map((direction, index) => index === item.info?.directions.length - 1 ? direction : ` ${direction} - `)}</p>
+                                                        </>
+                                                        }
                                                     </div>
                                                     
                                                 </div>
@@ -69,14 +82,43 @@ const FullProgress = (props) => {
                             </ProgressCircle>
                         </div>    
                         <div className='flex flex-col gap-2 items-center'>
-                            <h2 className='font-montserrat text-xl'>Intervals Included</h2>
-                            <div className='grid grid-cols-3 gap-x-3 gap-y-2'>
-                                {intervalNames.map((interval, index) => 
-                                    
-                                    <div key={index} className={`text-center font-montserrat pb-1 border-sky-500 dark:border-amber-200 ${props.levelStats[showLevel].info.interval_names.includes(interval) ? 'border-b dark:text-sky-200' : 'text-gray-400/30'}`}>{interval}</div>
+                            {props.type === 'interval' &&
+                            <>
+                                <h2 className='font-montserrat text-xl'>Intervals Included</h2>
+                                <div className='grid grid-cols-3 gap-x-3 gap-y-2'>
+                                    {intervalNames.map((interval, index) => 
                                         
-                                )}
-                            </div>
+                                        <div key={index} className={`text-center font-montserrat pb-1 border-sky-500 dark:border-amber-200 ${props.levelStats[showLevel].info?.interval_names.includes(interval) ? 'border-b dark:text-sky-200' : 'text-gray-400/30'}`}>{interval}</div>
+                                            
+                                    )}
+                                </div>
+                            </>
+                            }
+                            {props.type === 'progression' &&
+                            <>
+                                <h2 className='font-montserrat text-xl'>Chords Included</h2>
+                                <div className='grid grid-cols-3 gap-x-3 gap-y-2'>
+                                    {chordRomans.map((chord, index) => 
+                                        
+                                        <div key={chord} className={`text-center font-montserrat pb-1 border-sky-500 dark:border-amber-200 ${indexToChords[props.levelStats[showLevel].info?.chords_included].includes(index) ? 'border-b dark:text-sky-200' : 'text-gray-400/30'}`}>{chord}</div>
+                                            
+                                    )}
+                                </div>
+                            </>
+                            }
+                            {props.type === 'progression' &&
+                            <>
+                                <h2 className='font-montserrat text-xl'>Inversions</h2>
+                                <div className='flex flex-col'>
+                                    {inversions.map((inversion, index) => 
+                                        
+                                        <div key={index} className={`text-center font-montserrat pb-1 border-sky-500 dark:border-amber-200 ${props.levelStats[showLevel].info?.inversions.includes(inversion) ? 'border-b dark:text-sky-200' : 'text-gray-400/30'}`}>{inversion}</div>
+                                            
+                                    )}
+                                </div>
+                            </>
+                            }
+                            
                         </div>
                     </div>
                     

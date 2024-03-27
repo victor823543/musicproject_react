@@ -8,7 +8,6 @@ import CloseButtonWhite from '../assets/icons/close-button-white.svg'
 
 const SideBar = ({isOpen, closeSidebar, navObject, isAuthenticated, logout, themeComponent}) => {
     
-
     return (
         <div className={`fixed inset-y-0 right-0 bg-zinc-100 dark:bg-black w-64 p-4 z-40 ${isOpen ? 'block' : 'hidden'}`}>
             <ul className=' flex flex-col gap-6'>

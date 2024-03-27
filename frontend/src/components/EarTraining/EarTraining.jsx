@@ -4,6 +4,7 @@ import IntervalProgress from "./IntervalProgress"
 import Melodies from "./Melodies"
 import Chords from "./Chords"
 import Progressions from "./Progressions"
+import ProgressionProgress from './ProgressionProgress'
 import { useState } from 'react'
 import { Routes, Route, Link} from 'react-router-dom'
 
@@ -19,6 +20,7 @@ const EarTraining = (props) => {
             <Route path="/melodies" element={<Melodies />} />
             <Route path="/chords" element={<Chords />} />
             <Route path="/progressions" element={<Progressions />} />
+            <Route path="/progressions/progress-mode" element={<ProgressionProgress user={props.user}/>}/>
         </Routes>
 
     </div>

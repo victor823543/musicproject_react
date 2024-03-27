@@ -15,7 +15,7 @@ import mingus.core.scales as scales
 from mingus.containers import Note
 import random
 import json
-from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session, generate_melodies_session, generate_interval_progress_session, create_interval_stats_object, create_chartdata, update_stats
+from .functions import create_new_song, generate_audio, generate_interval_session, generate_chords_session, generate_progression_session, generate_melodies_session, generate_interval_progress_session, generate_progression_progress_session, create_interval_stats_object, create_progression_stats_object, create_chartdata, update_stats
 
 #Authentication
 @api_view(['POST'])
@@ -76,20 +76,38 @@ def delete_song(request, user_id, song_id):
 #Database communication for handling statistics
 @api_view(['GET'])
 def get_user_stats(request, user_id):
+    user_stats = {}
+    userProgress, created = UserProgress.objects.get_or_create(user_id=user_id)
+
     try:
         intervalStats = UserStats.objects.get(user_id=user_id, type='interval')
         intervalChart = create_chartdata(intervalStats.sessionStats)
-        userProgress, created = UserProgress.objects.get_or_create(user_id=user_id)
-        currentLevel = str(userProgress.intervalProgress + 1)
-        user_stats_interval = {
+        currentIntervalLevel = str(userProgress.intervalProgress + 1)
+
+        user_stats.update({
                     'intervalSessionStats': intervalStats.sessionStats,
                     'intervalProgressStats': intervalStats.progressStats,
-                    'currentLevel': currentLevel,
+                    'currentIntervalLevel': currentIntervalLevel,
                     'intervalChart': intervalChart
-                }
-        
-        return JsonResponse(user_stats_interval)
-    except UserStats.DoesNotExist:
+                })
+    except UserStats.DoesNotExist:  
+        pass
+
+    try:
+        progressionStats = UserStats.objects.get(user_id=user_id, type='progression')
+        currentProgressionLevel = str(userProgress.progressionProgress + 1)
+
+        user_stats.update({
+                    'progressionSessionStats': progressionStats.sessionStats,
+                    'progressionProgressStats': progressionStats.progressStats,
+                    'currentProgressionLevel': currentProgressionLevel,
+                })
+    except UserStats.DoesNotExist:  
+        pass
+
+    if user_stats:
+        return JsonResponse(user_stats)
+    else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
@@ -100,17 +118,28 @@ def update_user_stats(request, user_id):
         return Response({"error": "Invalid user_id"}, status=status.HTTP_400_BAD_REQUEST)
     
     data = json.loads(request.body)
-    print(data)
     session = data['sessionStats']
     progress = data['progressStats']
     eartrainingType = data['type']
     stats, created = UserStats.objects.get_or_create(user_id=user_id, type=eartrainingType)
-    print(created)
 
-    
-    if data['type'] == 'interval': #Interval
+
+    if data['type'] == 'interval':
         if created:
             newSessionStats, newProgressStats = create_interval_stats_object()
+            stats.sessionStats = newSessionStats
+            stats.progressStats = newProgressStats
+        else:
+            newSessionStats = stats.sessionStats
+            newProgressStats = stats.progressStats
+
+        updatedSessionStats, updatedProgressStats = update_stats(eartrainingType, session, progress, newSessionStats, newProgressStats)
+        stats.sessionStats = updatedSessionStats
+        stats.progressStats = updatedProgressStats
+    
+    if data['type'] == 'progression':
+        if created:
+            newSessionStats, newProgressStats = create_progression_stats_object()
             stats.sessionStats = newSessionStats
             stats.progressStats = newProgressStats
         else:
@@ -130,6 +159,13 @@ def update_user_stats(request, user_id):
 def update_interval_progress(request, user_id):
     user_progress = get_object_or_404(UserProgress, user_id=user_id)
     user_progress.intervalProgress += 1
+    user_progress.save()
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def update_progression_progress(request, user_id):
+    user_progress = get_object_or_404(UserProgress, user_id=user_id)
+    user_progress.progressionProgress += 1
     user_progress.save()
     return Response(status=status.HTTP_200_OK)
 
@@ -230,11 +266,14 @@ def transpose(request):
             
             new_chord_names = []
             for n in new_chord_numbers:
-                c = Note()
-                c.from_int(n)
-                new_chord_names.append(c.name)
+                #c = Note()
+                #c.from_int(n)
+                n = n - 60 if n - 60 < 12 else n - 72
+                c = notes.int_to_note(n, 'b')
+                new_chord_names.append(c)
             print(new_chord_numbers)
             print(new_chord_names)
+            print(chords.determine(new_chord_names, True))
             new_key = chords.determine(new_chord_names, True)[0]
             transposed_chords[new_key] = new_chord_numbers
 
@@ -348,6 +387,26 @@ def get_progressions(request):
         session_object = generate_progression_session(progressions_included, start, length, progression_length, inversions)
         response = JsonResponse(session_object)
         return response
+
+@csrf_exempt
+def get_progression_progress_mode(request, user_id):
+    if request.method == 'GET':
+        user_progress, created = UserProgress.objects.get_or_create(user_id=user_id)
+        progress = user_progress.progressionProgress
+        try:
+            stats = UserStats.objects.get(user_id=user_id, type='progression')
+            progressObject = stats.progressStats
+            sessionBest = progressObject['levelStats'][str(progress + 1)]['bestScorePercent']
+        except UserStats.DoesNotExist:
+            progressObject = None
+            sessionBest = 0
+        
+        session_object = generate_progression_progress_session(progress)
+        session_object['progressInfo'] = progressObject
+        session_object['sessionBest'] = int(sessionBest)
+        response = JsonResponse(session_object)
+        return response
+        
 
 
 @csrf_exempt

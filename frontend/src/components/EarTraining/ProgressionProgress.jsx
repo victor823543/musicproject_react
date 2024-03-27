@@ -1,15 +1,14 @@
 import { useRef, useState, useEffect } from 'react'
 import MIDISounds from 'midi-sounds-react'
-import ProgressionsSettings from './ProgressionsSettings'
 import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
+import { ProgressCircle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react'
 
-const Progressions = () => {
+const ProgressionProgress = (props) => {
     const refMidi = useRef()
-    const [currentSettings, setCurrentSettings] = useState({})
     const [showStart, setShowStart] = useState(true)
     const [showMain, setShowMain] = useState(false)
-    const [progressionSession, setprogressionSession] = useState(null)
+    const [progressionSession, setProgressionSession] = useState(null)
     const [progress, setProgress] = useState(0)
     const [result, setResult] = useState({0: 0})
     const [guess, setGuess] = useState([])
@@ -17,7 +16,6 @@ const Progressions = () => {
     const [chordScore, setChordScore] = useState(0)
     const [isFinished, setIsFinished] = useState(false)
     const [stats, setStats] = useState({})
-    const [totalCompleted, setTotalCompleted] = useState(0)
     const [passedprogression, setPassedprogression] = useState({'chords': [], 'visible': false, 'triggered': true})
     const [showRoman, setShowRoman] = useState(true)
     const [spotSelected, setSpotSelected] = useState(0)
@@ -27,7 +25,11 @@ const Progressions = () => {
     const [tempo, setTempo] = useState(2)
     const [startRandom, setStartRandom] = useState(false)
     const [playingReference, setPlayingReference] = useState(false)
-    const [showSettings, setShowSettings] = useState(false)
+
+
+    useEffect(() => {
+        fetchSession()
+    }, [])
 
     useEffect(() => {
         if (!passedprogression['triggered']) {
@@ -43,38 +45,50 @@ const Progressions = () => {
     }, [passedprogression])
 
 
-    
     const defaultColor = 'bg-slate-200/40 dark:bg-slate-500/20'
     const clickedColor = 'bg-blue-500/30 dark:bg-sky-400/30'
 
 
-    const fetchprogressionSession = (paramsOut) => {
-        setCurrentSettings(paramsOut)
-        setProgLength(parseInt(paramsOut['progression_length']))
-        setSessionLength(parseInt(paramsOut['length']))
+    const fetchSession = () => {
+        const url = new URL(`http://localhost:8000/api/progression/progress/${props.user['user_id']}/`)
 
-        if (paramsOut['start']) {
-            setStartRandom(true)
-        }
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                setProgressionSession(data)
+                setProgLength(parseInt(data['progression_length']))
+                setSessionLength(parseInt(data['length']))
+                setStartRandom(data['start'] === 'Start on random')
+                setResult(Object.fromEntries(
+                    Array.from({ length: parseInt(data['length']) }, (_, index) => [index, 0])
+                    ))
+                setChordNames(data['chord_names'][0])
+            })
+            .catch(error => console.error('Error:', error))
+    }
 
-        const resObj = Object.fromEntries(
-                Array.from({ length: parseInt(paramsOut['length']) }, (_, index) => [index, 0])
-                )
-        setResult(resObj)
+    const fetchUpdateProgress = () => {
+        const url = new URL(`http://localhost:8000/api/progression/progress/update/${props.user['user_id']}/`)
+            fetch(url)
+                .then(response => 
+                        console.log(response)
+                    )
+                .catch(error => console.error('Error:', error))
+    }
 
+    const fetchUpdateStats = (progressStats) => {
 
-        const url = new URL('http://localhost:8000/api/progression/')
+        const url = new URL(`http://localhost:8000/api/update/stats/${props.user['user_id']}/`)
 
         const headers = new Headers({
             'Content-Type': 'application/json',
         })
 
         const dataToSend = {
-            'progressions_included': paramsOut['progressions_included'],
-            'start': paramsOut['start'],
-            'progression_length': paramsOut['progression_length'],
-            'length': paramsOut['length'],
-            'inversions': paramsOut['inversions'],
+            'type': 'progression',
+            'sessionStats': null,
+            'progressStats': progressStats,
         }
 
         const options = {
@@ -84,21 +98,12 @@ const Progressions = () => {
         }
 
         fetch(url, options)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                
-                setprogressionSession(data)
-                setChordNames(data['chord_names'][0])
-                console.log(data['chord_names'][0])
-                
-            })
+            .then(response => console.log(response))
             .catch(error => console.error('Error:', error))
 
     }
 
-    const handleStartClick = (params) => {
-        fetchprogressionSession(params)
+    const handleStartClick = () => {
         setShowStart(false)
         setShowMain(true)
     }
@@ -176,7 +181,7 @@ const Progressions = () => {
 
         let finalChordScore = chordScore
         let correctAmmount = 0
-            for (let i=0; i < progLength; i++) {
+            for (let i=0; i<progLength; i++) {
                 if (guess[i]['roman'] === progressionSession['progressions'][current][i]['roman']) {
                     correctAmmount++
                     finalChordScore++
@@ -188,6 +193,14 @@ const Progressions = () => {
         } else {
             var finalScore = score
         }
+
+        const progressStats = {
+            'result': finalScore,
+            'level': progressionSession?.level
+        }
+        
+        fetchUpdateStats(progressStats)
+
         getStats(finalScore, finalChordScore)
         setProgress(0)
         setGuess([])
@@ -215,43 +228,32 @@ const Progressions = () => {
         
         const sessionStats = {
             'correct': finalScore,
-            'total': sessionLength + totalCompleted,
+            'total': sessionLength,
+            'percent': Math.ceil((finalScore / sessionLength) * 100),
+            'moveOn': Math.ceil((finalScore / sessionLength) * 100) >= 100,
         }
+
+        if (sessionStats.moveOn) {
+            fetchUpdateProgress()
+        }
+
         const chordTotalStats = {
             'correct': finalChordScore,
-            'total': (sessionLength + totalCompleted) * progLength
+            'total': (sessionLength) * progLength
         }
 
         setStats({
             'sessionStats': sessionStats,
             'chordTotalStats': chordTotalStats,
         })
-
-        setTotalCompleted(sessionStats['total'])
     }
 
-    const handleExtendClick = (newSettings) => {
-        if (newSettings) {
-            setShowMain(false)
-            setShowStart(true)
-            setIsFinished(false)
-        } else {
-            fetchprogressionSession(currentSettings)
-            setIsFinished(false)
-        }
-    }
-
-    const handleRestartClick = (newSettings) => {
-        if (newSettings) {
-            setScore(0)
-            setShowMain(false)
-            setShowStart(true)
-            setIsFinished(false)
-        } else {
-            setScore(0)
-            fetchprogressionSession(currentSettings)
-            setIsFinished(false)
-        }
+    const handleRestartClick = () => {
+        setScore(0)
+        setShowMain(false)
+        setShowStart(true)
+        setIsFinished(false)
+        fetchSession()
     }
 
     const handleTempoMinus = () => {
@@ -320,7 +322,60 @@ const Progressions = () => {
         <div className='fixed bg-cover inset-0 -z-40 bg-white dark:bg-black'></div>
 
         {showStart &&
-            <ProgressionsSettings handleStartClick={handleStartClick} />
+            <div className='fixed inset-0 cover bg-slate-700/40 flex flex-col justify-center items-center dark:text-sky-200/80'>
+                <div className='bg-zinc-200 dark:bg-slate-950 p-20 flex flex-col gap-10 items-center rounded-xl shadow-xl'>
+                    <h1 className='font-montserrat text-3xl text-center'>Progress mode</h1>
+                    <div className='flex gap-10'>
+                        <div className='flex flex-col items-center gap-3'>
+                            <h2 className='font-montserrat text-xl'>Total progress</h2>
+                            <ProgressCircle value={progressionSession?.totalProgress} size="lg" showAnimation>
+                                <span className="text-sm font-medium font-montserrat text-slate-700">{`${progressionSession?.totalProgress}%`}</span>
+                            </ProgressCircle>
+                        </div>
+                        <div className='flex flex-col items-center gap-3'>
+                            <h2 className='font-montserrat text-xl'>Session progress</h2>
+                            <ProgressCircle value={progressionSession?.sessionBest} size="lg" showAnimation>
+                                <span className="text-sm font-medium font-montserrat text-slate-700">{`${progressionSession?.sessionBest}%`}</span>
+                            </ProgressCircle>
+                        </div>
+                    </div>
+                    <h2 className='font-montserrat text-2xl text-center mt-5'>{`Current session - ${progressionSession?.level}`}</h2>
+                    
+                    <div className='flex gap-10'>
+                        <div className='flex flex-col items-center'>
+                            <h3>Session information</h3>
+                            <TabGroup>
+                                <TabList variant='line'>
+                                    <Tab>Chords</Tab>
+                                    <Tab>Start</Tab>
+                                    <Tab>Inversions</Tab>
+                                    <Tab>Length</Tab>
+                                    <Tab>Progression length</Tab>
+                                </TabList>
+                                <TabPanels>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{chordNames.map((chord) => `${chord['roman']}, `)}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.start}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.inversions.map((inversion, index) => `${inversion}${(progressionSession?.inversions.length > index + 1) ? ', ' : ''}`)}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.length}</p>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.progression_length}</p>
+                                    </TabPanel>
+                                </TabPanels>
+                            </TabGroup>
+                        </div>
+
+                    </div>
+                    <button onClick={handleStartClick} className='py-2 px-4 bg-blue-600/30 ring-2 ring-blue-800 dark:ring-sky-400 rounded-sm font-montserrat'>Start current session</button>
+                </div>
+            </div>
         }
 
         {showMain && 
@@ -406,29 +461,29 @@ const Progressions = () => {
         }
         {isFinished && 
             <div className='fixed top-0 left-0 w-full h-full flex items-center justify-center bg-zinc-800 bg-opacity-50 z-10 pt-20 pb-4'>
-                <div className='bg-zinc-200 dark:bg-slate-700 max-h-full xsPlus:px-8 py-8 rounded-lg shadow-xl overflow-scroll hideScrollbar'>
-                    <div className='flex flex-col items-center gap-4 dark:text-sky-200'>
-                        <h1 className='text-3xl font-montserrat text-center mb-5'>Good job</h1>
-                        <h1 className='text-xl font-montserrat text-center'>Your score</h1>
-                        <p className='fonst-montserrat text-lg'>{`Progressions: ${stats['sessionStats']['correct']}/${stats['sessionStats']['total']}`}</p>
-                        <p className='fonst-montserrat text-lg'>{`Chords: ${stats['chordTotalStats']['correct']}/${stats['chordTotalStats']['total']}`}</p>
-                        
-                        
-                        <div className='grid grid-cols-2 gap-2 px-2'>
-                            <button onClick={() => handleRestartClick(false)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Restart session</button>
-                            <button onClick={() => handleRestartClick(true)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Restart with new settings</button>
-                            <button onClick={() => handleExtendClick(false)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Extend session</button>
-                            <button onClick={() => handleExtendClick(true)} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>Extend with new settings</button>
-                        </div>
-                        
+            <div className='bg-zinc-200 dark:bg-slate-700 max-h-full xsPlus:px-8 py-8 rounded-lg shadow-xl overflow-scroll hideScrollbar'>
+                <div className='flex flex-col items-center gap-4 dark:text-sky-200'>
+                    <h1 className='text-3xl font-montserrat text-center mb-5'>Good job</h1>
+                    <p className='fonst-montserrat text-lg'>{`Progressions: ${stats['sessionStats']['correct']}/${stats['sessionStats']['total']}`}</p>
+                    <p className='fonst-montserrat text-lg'>{`Chords: ${stats['chordTotalStats']['correct']}/${stats['chordTotalStats']['total']}`}</p>
+                    <div className='flex flex-col items-center gap-3'>
+                        <h2 className='font-montserrat text-xl'>Session progress</h2>
+                        <ProgressCircle value={stats['sessionStats']['percent']} size="lg">
+                            <span className="text-sm font-medium font-montserrat text-slate-700">{`${stats['sessionStats']['percent']}%`}</span>
+                        </ProgressCircle>
                     </div>
+                    
+                    <button onClick={handleRestartClick} className='bg-blue-300 border-2 border-blue-500 px-4 py-2 max-xs:px-2 max-xs:py-1 rounded-md text-black font-light'>{stats.sessionStats['moveOn'] ? 'Next session' : 'Try again'}</button>
+                        
+                    
                 </div>
-                
             </div>
+            
+        </div>
         }
         
     </div>
   )
 }
 
-export default Progressions
+export default ProgressionProgress

@@ -17,7 +17,6 @@ const IntervalProgress = (props) => {
     const [score, setScore] = useState(0)
     const [isFinished, setIsFinished] = useState(false)
     const [stats, setStats] = useState({})
-    const [storedStats, setStoredStats] = useState(null)
     const [passedInterval, setPassedInterval] = useState({'name': '', 'correct': true, 'visible': false, 'triggered': true})
     const [showAll, setShowAll] = useState(false)
 
@@ -198,11 +197,9 @@ const IntervalProgress = (props) => {
     }
 
     const getStats = (finalScore, finalResult) => {
-        if (storedStats) {
-            var intervalStats = storedStats
-        } else {
-            var intervalStats = {}
-        }
+        
+        var intervalStats = {}
+        
         
         intervalNames.forEach(interval => {
             if (!(intervalStats.hasOwnProperty(interval))) {
@@ -232,13 +229,10 @@ const IntervalProgress = (props) => {
             'intervalStats': intervalStats,
             'sessionStats': sessionStats,
         })
-
-        setStoredStats(intervalStats)
     }
 
     const handleRestartClick = () => {
             setScore(0)
-            setStoredStats(null)
             setShowMain(false)
             setShowStart(true)
             setIsFinished(false)

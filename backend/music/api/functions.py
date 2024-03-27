@@ -649,7 +649,7 @@ def generate_progression_session(chords_included, start, length, progression_len
                 if number < chord_numbers[0] or (former_index >= 0 and number < chord_numbers[former_index]):
                     chord_numbers[index] += 12
         
-        return chord_numbers, name, roman
+        return chord_numbers, name, roman    
     
     def create_chord_names(key):
         chord_names = []
@@ -720,6 +720,101 @@ def generate_progression_session(chords_included, start, length, progression_len
     session['chord_names'] = chord_names_obj
 
     return session
+
+def generate_progression_progress_session(progress, infoOnly=False):
+    
+    if 0 <= progress <= 9:
+        chords_included = 0
+        start = 0
+        progression_length = 4
+        length = 10
+        inversions = [0]
+    if 10 <= progress <= 16:
+        chords_included = 1
+        start = 0
+        progression_length = 4
+        length = 10
+        inversions = [0, 1, 2]
+    if 17 <= progress:
+        chords_included = 2
+        start = 0
+        progression_length = 4
+        length = 10
+        inversions = [0, 1, 2]
+
+    if progress == 0:
+        progression_length = 3
+    if progress == 1:
+        length = 20
+    if 2 <= progress <=4:
+        inversions = [0, 1]
+    if 5 <= progress <=9:
+        inversions = [0, 1, 2]
+    if progress == 3:
+        progression_length = 3
+    if progress == 4:
+        length = 20
+    if progress == 6:
+        progression_length = 5
+    if progress == 7:
+        start = 1
+    if progress == 8:
+        start = 1
+        length = 20
+    if progress == 9:
+        start = 1
+        progression_length = 5
+        length = 20
+    if progress == 10:
+        inversions = [0]
+    if progress == 12:
+        length = 20
+    if progress == 13:
+        start = 1
+    if progress == 14:
+        start = 1
+        length = 20
+    if progress == 15:
+        progression_length = 5
+    if progress == 16:
+        progression_length = 5
+        start = 1
+        length = 20
+    if progress == 17:
+        inversions = [0]
+        progression_length = 3
+    if progress == 18:
+        inversions = [0]
+        length = 20
+    if progress == 20:
+        progression_length = 5
+    if progress == 21:
+        start = 1
+        length = 20
+    if progress == 22:
+        progression_length = 6
+        length = 30
+    if progress == 23:
+        progression_length = 6
+        length = 3
+        start = 1
+    
+    if infoOnly:
+        session = {}
+    else:
+        session = generate_progression_session(chords_included, start, length, progression_length, inversions)
+    session['chords_included'] = 'Basic' if not chords_included else 'All diatonic' if chords_included == 1 else '+ seventh'
+    session['length'] = length
+    session['progression_length'] = progression_length
+    start_alias = ['tonic', 'random']
+    session['start'] = f'Start on {start_alias[start]}'
+    inversion_alias = ['First inversion', 'Second inversion']
+    session['inversions'] = ['No inversions'] if len(inversions) <= 1 else [inversion_alias[inversions[1:].index(x)] for x in inversions[1:]]
+    session['level'] = progress + 1
+    session['totalProgress'] = round(((progress) / 24) * 100)
+
+    return session
+
 
 def generate_melodies_session(notes_included, difficulty, start, length, melody_length):
 
@@ -800,7 +895,7 @@ def create_interval_stats_object():
             'bestScorePercent': 0,
             'info': info,
         }
-        progressLevelStats[i + 1] = progressObject
+        progressLevelStats[str(i + 1)] = progressObject
     progressStats = {
         'levelStats': progressLevelStats,
         'totalStats': {
@@ -823,11 +918,45 @@ def create_interval_stats_object():
 
     return sessionStats, progressStats
 
+def create_progression_stats_object():
+    progressLength = 24
+    progressLevelStats = {}
+    for i in range(progressLength):
+        info = generate_progression_progress_session(i, infoOnly=True)
+        progressObject = {
+            'bestScore': 0,
+            'bestScorePercent': 0,
+            'info': info,
+        }
+        progressLevelStats[str(i + 1)] = progressObject
+    progressStats = {
+        'levelStats': progressLevelStats,
+        'totalStats': {
+                'completed': 0,
+                'goal': progressLength,
+                'progressPercent': 0,
+        }
+    }
+    
+    sessionStats = {'status': 'Coming soon'}
+
+
+    return sessionStats, progressStats
+
 def update_stats(eartrainingType, session, progress, newSessionStats, newProgressStats): 
+
+    def update_progress(progress_length):
+        level = str(progress['level'])
+        print(newProgressStats)
+        newProgressStats['levelStats'][level]['bestScore'] = max(int(newProgressStats['levelStats'][level]['bestScore']), int(progress['result']))
+        newProgressStats['levelStats'][level]['bestScorePercent'] = round((int(newProgressStats['levelStats'][level]['bestScore']) / int(newProgressStats['levelStats'][level]['info']['length'])) * 100)
+        total_completed = count_key_value_pairs(newProgressStats['levelStats'], 'bestScorePercent', 100)
+        total_progress = round((total_completed / progress_length) * 100)
+        newProgressStats['totalStats']['completed'] = total_completed
+        newProgressStats['totalStats']['progressPercent'] = total_progress
 
     if eartrainingType == 'interval':
         if session:
-            print('Came to session')
             for interval, result in session.items():
                 newSessionStats[interval]['total'] += int(result['total'])
                 newSessionStats[interval]['correct'] += int(result['correct'])
@@ -836,13 +965,11 @@ def update_stats(eartrainingType, session, progress, newSessionStats, newProgres
                 else:
                     newSessionStats[interval]['percent'] = 0
         if progress:
-            level = str(progress['level'])
-            newProgressStats['levelStats'][level]['bestScore'] = max(int(newProgressStats['levelStats'][level]['bestScore']), int(progress['result']))
-            newProgressStats['levelStats'][level]['bestScorePercent'] = round((int(newProgressStats['levelStats'][level]['bestScore']) / int(newProgressStats['levelStats'][level]['info']['length'])) * 100)
-            total_completed = count_key_value_pairs(newProgressStats['levelStats'], 'bestScorePercent', 100)
-            total_progress = round((total_completed / 23) * 100)
-            newProgressStats['totalStats']['completed'] = total_completed
-            newProgressStats['totalStats']['progressPercent'] = total_progress
+            update_progress(23)
+    
+    if eartrainingType == 'progression':
+        if progress:
+            update_progress(24)
 
     return newSessionStats, newProgressStats
 
