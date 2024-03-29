@@ -14,6 +14,9 @@ const HomePageGuest = (props) => {
     const [showSignup, setShowSignup] = useState(false)
     const [showStart, setShowStart] = useState(true)
 
+    useEffect(() => {
+        props.refreshAuthentication()
+    }, [])
     
     useEffect(() => {
 

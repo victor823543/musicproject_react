@@ -3,6 +3,7 @@ import MIDISounds from 'midi-sounds-react'
 import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
 import { ProgressCircle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react'
+import { ACCESS_TOKEN } from '../../constants'
 
 const ProgressionProgress = (props) => {
     const refMidi = useRef()
@@ -50,9 +51,14 @@ const ProgressionProgress = (props) => {
 
 
     const fetchSession = () => {
-        const url = new URL(`http://localhost:8000/api/progression/progress/${props.user['user_id']}/`)
+        const url = new URL(`http://localhost:8000/api/progression/progress/`)
+        const token = localStorage.getItem(ACCESS_TOKEN)
 
-        fetch(url)
+        fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 console.log(data)
@@ -69,20 +75,28 @@ const ProgressionProgress = (props) => {
     }
 
     const fetchUpdateProgress = () => {
-        const url = new URL(`http://localhost:8000/api/progression/progress/update/${props.user['user_id']}/`)
-            fetch(url)
-                .then(response => 
-                        console.log(response)
-                    )
-                .catch(error => console.error('Error:', error))
-    }
+        const url = new URL(`http://localhost:8000/api/progression/progress/update/`)
+        const token = localStorage.getItem(ACCESS_TOKEN)
+
+        fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => 
+                console.log(response)
+            )
+        .catch(error => console.error('Error:', error))
+        }
 
     const fetchUpdateStats = (progressStats) => {
 
-        const url = new URL(`http://localhost:8000/api/update/stats/${props.user['user_id']}/`)
+        const url = new URL(`http://localhost:8000/api/update/stats/`)
 
+        const token = localStorage.getItem(ACCESS_TOKEN)
         const headers = new Headers({
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         })
 
         const dataToSend = {

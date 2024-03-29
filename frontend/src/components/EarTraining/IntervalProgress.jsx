@@ -4,6 +4,7 @@ import MIDISounds from 'midi-sounds-react'
 import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
 import FullProgress from './FullProgress'
+import { ACCESS_TOKEN } from '../../constants'
 
 const IntervalProgress = (props) => {
     const refMidi = useRef()
@@ -42,9 +43,14 @@ const IntervalProgress = (props) => {
     const clickedColor = 'bg-blue-500/30 dark:bg-sky-400/30'
 
     const fetchSession = () => {
-        const url = new URL(`http://localhost:8000/api/interval/progress/${props.user['user_id']}/`)
+        const url = new URL(`http://localhost:8000/api/interval/progress/`)
+        const token = localStorage.getItem(ACCESS_TOKEN)
 
-        fetch(url)
+        fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 console.log(data)
@@ -58,8 +64,15 @@ const IntervalProgress = (props) => {
     }
 
     const fetchUpdateProgress = () => {
-        const url = new URL(`http://localhost:8000/api/interval/progress/update/${props.user['user_id']}/`)
-            fetch(url)
+
+        const url = new URL(`http://localhost:8000/api/interval/progress/update/`)
+        const token = localStorage.getItem(ACCESS_TOKEN)
+
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
                 .then(response => 
                         console.log(response)
                     )
@@ -80,10 +93,12 @@ const IntervalProgress = (props) => {
             
         }
 
-        const url = new URL(`http://localhost:8000/api/update/stats/${props.user['user_id']}/`)
+        const url = new URL(`http://localhost:8000/api/update/stats/`)
 
+        const token = localStorage.getItem(ACCESS_TOKEN)
         const headers = new Headers({
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         })
 
         const dataToSend = {

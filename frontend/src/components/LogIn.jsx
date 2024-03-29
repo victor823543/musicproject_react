@@ -1,17 +1,23 @@
 import { useState } from 'react'
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants'
+import { useNavigate } from 'react-router-dom'
 
 const LogIn = (props) => {
     const [inputData, setInputData] = useState({username: '', password: ''})
-
+    const navigate = useNavigate()
 
     const handleSubmit = e => {
         e.preventDefault()
-        fetch('http://localhost:8000/api/login/', {
+        const data = {
+            username: inputData.username,
+            password: inputData.password,
+        }
+        fetch('http://localhost:8000/api/token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(inputData),
+            body: JSON.stringify(data)
         })
         .then((response) => {
             if (!response.ok) {
@@ -20,9 +26,12 @@ const LogIn = (props) => {
             return response.json()
         })
         .then((data) => {
-           console.log(data) 
-           setInputData({username: '', password: ''})
-           props.handleAuthentication(data['token'], data['user']['username'], data['user']['id'])
+            console.log(data) 
+            setInputData({username: '', password: ''})
+            localStorage.setItem(ACCESS_TOKEN, data.access)
+            localStorage.setItem(REFRESH_TOKEN, data.refresh)
+            props.handleAuthentication()
+            navigate(props.navigate)
         }) 
         .catch(err => console.log(err))
     }

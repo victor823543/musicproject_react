@@ -3,6 +3,7 @@ import MIDISounds from 'midi-sounds-react'
 import IntervalsSettings from './IntervalsSettings'
 import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
+import { ACCESS_TOKEN } from '../../constants'
 
 const Intervals = (props) => {
     const refMidi = useRef()
@@ -95,10 +96,11 @@ const Intervals = (props) => {
             
         }
 
-        const url = new URL(`http://localhost:8000/api/update/stats/${props.user['user_id']}/`)
-
+        const url = new URL(`http://localhost:8000/api/update/stats/`)
+        const token = localStorage.getItem(ACCESS_TOKEN)
         const headers = new Headers({
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         })
 
         const dataToSend = {

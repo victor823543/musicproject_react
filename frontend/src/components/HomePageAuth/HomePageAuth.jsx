@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { BarChart, ProgressCircle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react'
 import FullProgress from '../EarTraining/FullProgress'
+import { ACCESS_TOKEN } from '../../constants'
 
 const HomePageAuth = (props) => {
     const navigate = useNavigate()
@@ -16,9 +17,14 @@ const HomePageAuth = (props) => {
 
     useEffect(() => {
         const fetchStats = () => {
-            const url = new URL(`http://localhost:8000/api/userstats/${props.user['user_id']}/`)
+            const url = new URL(`http://localhost:8000/api/userstats/`)
+            const token = localStorage.getItem(ACCESS_TOKEN)
 
-            fetch(url)
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
                 .then(response => {
                     if (response.ok) {
                         response.json()
@@ -46,9 +52,14 @@ const HomePageAuth = (props) => {
         }
 
         const fetchSongs = () => {
-            const url = new URL(`http://localhost:8000/api/users/${props.user['user_id']}/songs`)
+            const url = new URL(`http://localhost:8000/api/songs`)
+            const token = localStorage.getItem(ACCESS_TOKEN)
 
-            fetch(url)
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
@@ -63,10 +74,16 @@ const HomePageAuth = (props) => {
     }, [updateUI])
 
     const fetchDeleteSong = (song_id) => {
-        const url = new URL(`http://localhost:8000/api/users/${props.user['user_id']}/songs/${song_id}/delete`)
+        const url = new URL(`http://localhost:8000/api/users/songs/${song_id}/delete`)
+        const token = localStorage.getItem(ACCESS_TOKEN)
+        const headers = new Headers({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        })
 
         const options = {
             method: 'DELETE',
+            headres: headers,
         }
 
         fetch(url, options)
@@ -98,7 +115,7 @@ const HomePageAuth = (props) => {
             <div style={{backgroundImage: `url(${image_white_grand})`}} className='dark:hidden fixed bg-cover inset-0 bg-center -z-20 '></div>
             <div style={{backgroundImage: `url(${image_dark_grand})`}} className='dark:block hidden fixed bg-cover inset-0 bg-center -z-20 '></div>
             <div className=' fixed bg-cover inset-0 -z-10 backdrop-blur-md'></div>
-            <h1 className='text-center text-3xl xs:text-4xl lg:text-5xl xl:text-6xl font-montserrat font-light text-shadow-lg shadow-teal-800/60 dark:text-shadow dark:shadow-sky-400 my-10'>Welcome {props.user['username']}</h1>
+            <h1 className='text-center text-3xl xs:text-4xl lg:text-5xl xl:text-6xl font-montserrat font-light text-shadow-lg shadow-teal-800/60 dark:text-shadow dark:shadow-sky-400 my-10'>Welcome {props.username}</h1>
             <div className='mt-10'>
                 <p className='font-montserrat text-lg text-center'>Get started by creating a song or practicing eartraining</p>
                 <div className='flex justify-evenly mt-4'>

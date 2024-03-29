@@ -3,6 +3,34 @@ import { useState } from 'react'
 const SignUp = (props) => {
     const [inputData, setInputData] = useState({username: '', password: '', email: ''})
 
+    const logIn = (username, password) => {
+        const data = {
+            username: username,
+            password: password,
+        }
+        fetch('http://localhost:8000/api/token/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+            return response.json()
+        })
+        .then((data) => {
+            console.log(data) 
+            setInputData({username: '', password: ''})
+            localStorage.setItem(ACCESS_TOKEN, access)
+            localStorage.setItem(REFRESH_TOKEN, refresh)
+            props.handleAuthentication()
+            navigate(props.navigate)
+        }) 
+        .catch(err => console.log(err))
+    }
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -21,8 +49,8 @@ const SignUp = (props) => {
         })
         .then((data) => {
            console.log(data) 
+           logIn(username, password)
            setInputData({username: '', password: '', email: ''})
-           props.handleAuthentication(data['token'], data['user']['username'])
         }) 
         .catch(err => console.log(err))
     }

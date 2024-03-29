@@ -1,6 +1,6 @@
 
 import arrowDown from '../../assets/icons/arrow-down.svg'
-
+import { ACCESS_TOKEN } from '../../constants'
 import MusicPageChords from './MusicPageChords'
 import MusicPageForm from './MusicPageForm'
 import MusicPageOptions from './MusicPageOptions'
@@ -120,10 +120,12 @@ const MusicPage = (props) => {
     }
 
     const fetchStoreSong = () => {
-        const url = new URL(`http://localhost:8000/api/users/${props.user['user_id']}/store/`)
+        const url = new URL(`http://localhost:8000/api/songs/store/`)
 
+        const token = localStorage.getItem(ACCESS_TOKEN)
         const headers = new Headers({
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         })
 
         const dataToSend = {

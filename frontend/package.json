@@ -14,6 +14,7 @@
     "@headlessui/tailwindcss": "^0.2.0",
     "@remixicon/react": "^4.2.0",
     "@tremor/react": "^3.14.1",
+    "jwt-decode": "^4.0.0",
     "midi-sounds-react": "^1.2.54",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

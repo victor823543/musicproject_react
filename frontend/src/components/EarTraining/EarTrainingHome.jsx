@@ -1,12 +1,26 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from 'react'
+import useAuthentication from "../../hooks/useAuthentication"
+import LoginModal from '../LoginModal'
 
 const EarTrainingHome = () => {
+    const { isAuthenticated, loading, refreshAuthentication } = useAuthentication()
     const navigate = useNavigate()
     const [selected, setSelected] = useState(0)
+    const [displayLogin, setDisplayLogin] = useState(false)
+    const [rememberedRoute, setRememberedRoute] = useState('')
 
     const handleMouseOver = (section) => {
         setSelected(section)
+    }
+
+    const handleProgressClick = (route) => {
+        if (isAuthenticated) {
+            navigate(route)
+        } else {
+            setRememberedRoute(route)
+            setDisplayLogin(true)
+        }
     }
 
   return (
@@ -26,7 +40,7 @@ const EarTrainingHome = () => {
                         <p className="font-montserrat font-light text-center text-pretty">Practice freely with your own settings</p>
                     </div>
                     <div className="flex flex-col items-center skew-x-12 px-16">
-                        <button onClick={() => navigate('/eartraining/intervals/progress-mode')} className="btn-e mb-2 bg-blue-200/60 ring-blue-800 dark:bg-blue-950 dark:ring-blue-500">Progress mode</button>
+                        <button onClick={() => handleProgressClick('/eartraining/intervals/progress-mode')} className="btn-e mb-2 bg-blue-200/60 ring-blue-800 dark:bg-blue-950 dark:ring-blue-500">Progress mode</button>
                         <p className="font-montserrat font-light text-center text-pretty">Learn with automated progress</p>
                     </div>
                 </div>
@@ -77,7 +91,7 @@ const EarTrainingHome = () => {
                         <p className="font-montserrat font-light text-center text-pretty">Practice freely with your own settings</p>
                     </div>
                     <div className="flex flex-col items-center skew-x-12 px-16">
-                        <button onClick={() => navigate('/eartraining/progressions/progress-mode')} className="btn-e mb-2 bg-fuchsia-200/60 ring-fuchsia-700 dark:bg-violet-950 dark:ring-fuchsia-500">Guided learning</button>
+                        <button onClick={() => handleProgressClick('/eartraining/progressions/progress-mode')} className="btn-e mb-2 bg-fuchsia-200/60 ring-fuchsia-700 dark:bg-violet-950 dark:ring-fuchsia-500">Guided learning</button>
                         <p className="font-montserrat font-light text-center text-pretty">Learn with automated progress</p>
                     </div>    
                 </div>       
@@ -100,6 +114,11 @@ const EarTrainingHome = () => {
                 <p className="text-fuchsia-900 dark:text-fuchsia-400 skew-x-12 text-center font-montserrat">Chord progression</p>
             </div>
         </div>
+
+        {displayLogin && 
+            <LoginModal navigate={rememberedRoute} handleAuthentication={refreshAuthentication}/>
+        }
+
     </div>
   )
 }
