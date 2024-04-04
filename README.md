@@ -1,11 +1,10 @@
 # Get started
 
 ## Install dependencies
-**Install all dependencies for the backend (and create a virtual environment - optional) by changing directory to the backend folder and running the commands:**  
+**Install all dependencies for the backend and create a virtual environment by running the commands:**  
 `python3 -m venv venv`  
-`source venv/bin/activate` for macOS or Linux and `venv\Scripts\activate` for Windows  
-`pip install -r requirements.txt` (might need to use pip3 for macOS and Linux)  
-`deactivate` to deactivate the virtual environment
+`source venv/bin/activate` for macOS or Linux and `venv\Scripts\activate` for Windows (activating the virtual environment)
+`pip install -r requirements.txt` (might need to use pip3 for macOS and Linux)
 
 **Install all dependencies for the frontend by changing directory to the frontend folder and running the command:**  
 `npm install`
