@@ -54,7 +54,7 @@ const NavBar = (props) => {
     const navItems = {'Home': '/', 'Create music': '/music', 'Ear Training': '/eartraining', 'Account': '/account'}
 
     return (
-        <header className='fixed w-full py-5 px-4 z-40 bg-zinc-100 dark:bg-black/40 '>
+        <header className='fixed w-full py-5 px-4 z-40 bg-zinc-100/60 dark:bg-black/40 backdrop-blur-sm'>
             <nav className='flex justify-between items-center'>
                 <a href="/" className=' font-montserrat font-bold text-xl dark:text-teal-200'>LearnMusic</a>
                 <ul className='flex justify-center items-center gap-12 max-lg:hidden'>

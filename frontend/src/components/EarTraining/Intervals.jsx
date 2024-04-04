@@ -256,7 +256,8 @@ const Intervals = (props) => {
     const handleRestartClick = (newSettings) => {
         if (newSettings) {
             setScore(0)
-            setStoredStats(null)
+            setStoredStats(null) 
+            setTotalCompleted(0)
             setShowMain(false)
             setShowStart(true)
             setIsFinished(false)

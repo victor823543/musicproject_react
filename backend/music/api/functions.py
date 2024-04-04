@@ -345,6 +345,7 @@ def new_base(song, variation):
 #Create interval session
 def generate_interval_session(intervals_included, directions, width, length):
     interval_names = ['Minor second', 'Major second', 'Minor third', 'Major third', 'Perfect fourth', 'Tritone', 'Perfect fifth', 'Minor sixth', 'Major sixth', 'Minor seventh', 'Major seventh', 'Octave']
+    direction_choices = ['Up', 'Down', 'Unison']
     if width == 0:
         starting_note = 60
         scope_length = 12
@@ -361,9 +362,7 @@ def generate_interval_session(intervals_included, directions, width, length):
         interval = []
         interval_obj = {}
         if 'Random' in directions:
-            direction_choice = directions[:]
-            direction_choice.remove('Random')
-            temp_directions = [random.choice(direction_choice)]
+            temp_directions = [random.choice(direction_choices)]
         else:
             temp_directions = directions[:]
         if 'Up' in temp_directions:
@@ -397,7 +396,7 @@ def generate_interval_progress_session(progress, infoOnly=False):
         length = 10
     if 20 <= progress:
         intervals_included = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        directions = ['Up', 'Down', 'Unison', 'Random']
+        directions = ['Random']
         width = 1
         length = 10
     if progress == 0:

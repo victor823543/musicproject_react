@@ -173,73 +173,80 @@ const HomePageAuth = (props) => {
                         </TabList>
                         <TabPanels>
                             <TabPanel>
-                                <p className='text-center font-montserrat font-light text-xl mt-6'>Interval results chart</p>
-                                {charts ? 
-                                    <BarChart 
-                                        className='mb-6'
-                                        data={charts?.intervalChart}
-                                        index='name'
-                                        categories={[
-                                            'total',
-                                            'correct',
-                                            'wrong',
-                                        ]}
-                                        colors={['slate-700', 'green-500', 'red-500']}
-                                        valueFormatter={dataFormatter}
-                                        yAxisWidth={48}
-                                        showAnimation
-                                    /> : 
-                                    <p className='text-center mt-3'>No data available</p>
-                                }
-                                <p className='text-center font-montserrat font-light text-xl mt-6'>Interval progress mode</p>
-                                {stats?.intervalProgressStats ? 
-                                    <div className='flex flex-col gap-10 justify-center mt-4 mb-20'>
-                                        <div className='flex gap-16 justify-center'>
-                                            <div className='flex flex-col items-center gap-3'>
-                                                <h2 className='font-montserrat text-xl'>Total progress</h2>
-                                                <ProgressCircle className='relative' value={stats?.intervalProgressStats.totalStats.progressPercent} size="xl" strokeWidth={16} showAnimation>
-                                                    <span className="text-sm font-medium font-montserrat text-slate-700 dark:text-sky-100">{`${stats?.intervalProgressStats.totalStats.progressPercent}%`}</span>
-                                                </ProgressCircle>
-                                            </div>
-                                            <div className='relative flex gap-5 bg-slate-600/30 rounded-xl p-6 my-auto'>
-                                                {Array.from({ length: 3 }, (_, index) => parseInt(Math.max(1, stats?.currentIntervalLevel) - 1) + index).map((level, index) => {
+                                <p className='text-center font-montserrat font-light text-xl my-6 '>Interval results chart</p>
 
-                                                    return (
-                                                        <div key={level} className={`bg-sky-500/60 hover:bg-sky-800/40 px-4 py-2 rounded-lg text-black font-montserrat text-center ${(level == parseInt(stats?.currentIntervalLevel) && 'scale-125')}`}>
-                                                            <p>{`Level ${level}`}</p>
-                                                            <p className='text-xs'>{`Length: ${stats?.intervalProgressStats.levelStats[level.toString()].info.length}`}</p>
-                                                            <p className='text-xs'>{`Width: ${stats?.intervalProgressStats.levelStats[level.toString()].info.width}`}</p>
-                                                            <p className='text-xs'>...</p>
-                                                        </div>
-                                                    )
-                                                })}
-                                                <button onClick={() => setShowFullProgress('interval')} className='text-sm w-16 py-1 px-2 text-center text-black font-light bg-emerald-500/80 m-auto rounded-md'>Show all</button>
-                                                
+                                <div className='bg-slate-700/30 p-4 rounded-lg shadow-lg'>
+                                   {charts ? 
+                                        <BarChart 
+                                            className='mb-6'
+                                            data={charts?.intervalChart}
+                                            index='name'
+                                            categories={[
+                                                'total',
+                                                'correct',
+                                                'wrong',
+                                            ]}
+                                            colors={['slate-700', 'green-500', 'red-500']}
+                                            valueFormatter={dataFormatter}
+                                            yAxisWidth={48}
+                                            showAnimation
+                                        /> : 
+                                        <p className='text-center mt-3'>No data available</p>
+                                    } 
+                                </div>
+                                
+                                <p className='text-center font-montserrat font-light text-xl my-6'>Interval progress mode</p>
+                                {stats?.intervalProgressStats ? 
+                                    <div className='bg-slate-700/30 py-4 px-12 rounded-lg shadow-lg w-fit mx-auto my-5'>
+                                        <div className='flex flex-col gap-10 justify-center mt-4 mb-20'>
+                                            <div className='flex gap-16 justify-center'>
+                                                <div className='flex flex-col items-center gap-3'>
+                                                    <h2 className='font-montserrat text-xl'>Total progress</h2>
+                                                    <ProgressCircle className='relative' value={stats?.intervalProgressStats.totalStats.progressPercent} size="xl" strokeWidth={16} showAnimation>
+                                                        <span className="text-sm font-medium font-montserrat text-slate-700 dark:text-sky-100">{`${stats?.intervalProgressStats.totalStats.progressPercent}%`}</span>
+                                                    </ProgressCircle>
+                                                </div>
+                                                <div className='relative flex gap-5 bg-slate-600/30 rounded-xl p-6 my-auto'>
+                                                    {Array.from({ length: 3 }, (_, index) => parseInt(Math.max(1, stats?.currentIntervalLevel) - 1) + index).map((level, index) => {
+
+                                                        return (
+                                                            <div key={level} className={`bg-sky-500/60 hover:bg-sky-800/40 px-4 py-2 rounded-lg text-black font-montserrat text-center ${(level == parseInt(stats?.currentIntervalLevel) && 'scale-125')}`}>
+                                                                <p>{`Level ${level}`}</p>
+                                                                <p className='text-xs'>{`Length: ${stats?.intervalProgressStats.levelStats[level.toString()].info.length}`}</p>
+                                                                <p className='text-xs'>{`Width: ${stats?.intervalProgressStats.levelStats[level.toString()].info.width}`}</p>
+                                                                <p className='text-xs'>...</p>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                    <button onClick={() => setShowFullProgress('interval')} className='text-sm w-16 py-1 px-2 text-center text-black font-light bg-emerald-500/80 m-auto rounded-md'>Show all</button>
+                                                    
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className='flex gap-16 justify-center items-center'>
-                                            <div className='flex flex-col items-center gap-3'>
-                                                <h2 className='font-montserrat text-xl'>Session progress</h2>
-                                                <ProgressCircle className='relative' value={stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].bestScorePercent} size="xl" strokeWidth={16} showAnimation>
-                                                    <span className="text-sm font-medium font-montserrat text-slate-700 dark:text-sky-100">{`${stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].bestScorePercent}%`}</span>
-                                                </ProgressCircle>
+                                            <div className='flex gap-16 justify-center items-center'>
+                                                <div className='flex flex-col items-center gap-3'>
+                                                    <h2 className='font-montserrat text-xl'>Session progress</h2>
+                                                    <ProgressCircle className='relative' value={stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].bestScorePercent} size="xl" strokeWidth={16} showAnimation>
+                                                        <span className="text-sm font-medium font-montserrat text-slate-700 dark:text-sky-100">{`${stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].bestScorePercent}%`}</span>
+                                                    </ProgressCircle>
+                                                </div>
+                                                <div className='flex flex-col gap-1 items-center bg-slate-600/30 rounded-xl p-6 font-montserrat max-w-96'>
+                                                    <h2 className='text-center text-lg'>Current session information</h2>
+                                                    <div className='flex flex-wrap gap-4 text-sm font-light'>
+                                                        <p>{`Length: ${stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.length}`}</p>
+                                                        <p>{`Width: ${stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.width}`}</p>
+                                                    </div>
+                                                    <div className='flex gap-3'>
+                                                        <p className='text-sm'>Directions:</p>
+                                                        <p className='text-sm font-light'>{stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.directions.map((direction, index) => index === stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.directions.length - 1 ? direction : ` ${direction} - `)}</p>
+                                                    </div>
+                                                    <p className='text-base text-center mt-1'>Intervals</p>
+                                                    <p className='text-sm font-light text-center'>{stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.interval_names.map((interval, index) => index === stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.interval_names.length - 1 ? interval : ` ${interval} - `)}</p>
+                                                    </div>
                                             </div>
-                                            <div className='flex flex-col gap-1 items-center bg-slate-600/30 rounded-xl p-6 font-montserrat max-w-96'>
-                                                <h2 className='text-center text-lg'>Current session information</h2>
-                                                <div className='flex flex-wrap gap-4 text-sm font-light'>
-                                                    <p>{`Length: ${stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.length}`}</p>
-                                                    <p>{`Width: ${stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.width}`}</p>
-                                                </div>
-                                                <div className='flex gap-3'>
-                                                    <p className='text-sm'>Directions:</p>
-                                                    <p className='text-sm font-light'>{stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.directions.map((direction, index) => index === stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.directions.length - 1 ? direction : ` ${direction} - `)}</p>
-                                                </div>
-                                                <p className='text-base text-center mt-1'>Intervals</p>
-                                                <p className='text-sm font-light text-center'>{stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.interval_names.map((interval, index) => index === stats?.intervalProgressStats.levelStats[stats?.currentIntervalLevel].info.interval_names.length - 1 ? interval : ` ${interval} - `)}</p>
-                                                </div>
+                                            
                                         </div>
-                                        
-                                    </div> :
+                                    </div>
+                                     :
                                     <p className='text-center mt-3'>No data available</p>
                                 }
                             </TabPanel>

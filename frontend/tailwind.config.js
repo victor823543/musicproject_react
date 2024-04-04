@@ -52,14 +52,14 @@ export default {
             emphasis: colors.gray[700],
           },
           border: {
-            DEFAULT: colors.gray[200],
+            DEFAULT: colors.gray[400],
           },
           ring: {
             DEFAULT: colors.gray[200],
           },
           content: {
             subtle: colors.gray[400],
-            DEFAULT: colors.gray[500],
+            DEFAULT: colors.gray[300],
             emphasis: colors.gray[700],
             strong: colors.gray[900],
             inverted: colors.white,

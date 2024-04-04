@@ -36,13 +36,15 @@ const useAuthentication = () => {
                 setLoading(false);
                 return;
             }
-
+            console.log(refreshToken)
+            const content = {refresh: refreshToken}
             const response = await fetch('http://localhost:8000/api/token/refresh/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${refreshToken}`
-                }
+                    'Authorization': accessToken,
+                },
+                body: JSON.stringify(content),
             });
 
             if (!response.ok) {
@@ -53,7 +55,7 @@ const useAuthentication = () => {
             }
 
             const data = await response.json();
-            localStorage.setItem('accessToken', data.access);
+            localStorage.setItem(ACCESS_TOKEN, data.access);
             decodedToken = jwtDecode(data.access)
             setIsAuthenticated(true);
             setUsername(decodedToken.username)

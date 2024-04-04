@@ -4,6 +4,7 @@ import dark_music_image from '../../assets/images/dark-music-bg.jpeg'
 import light_music_image from '../../assets/images/light-music-bg.jpeg'
 import { ProgressCircle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react'
 import { ACCESS_TOKEN } from '../../constants'
+import FullProgress from './FullProgress'
 
 const ProgressionProgress = (props) => {
     const refMidi = useRef()
@@ -26,6 +27,7 @@ const ProgressionProgress = (props) => {
     const [tempo, setTempo] = useState(2)
     const [startRandom, setStartRandom] = useState(false)
     const [playingReference, setPlayingReference] = useState(false)
+    const [showAll, setShowAll] = useState(false)
 
 
     useEffect(() => {
@@ -354,33 +356,34 @@ const ProgressionProgress = (props) => {
                         </div>
                     </div>
                     <h2 className='font-montserrat text-2xl text-center mt-5'>{`Current session - ${progressionSession?.level}`}</h2>
-                    
+                    <button onClick={() => setShowAll(true)} className='py-2 px-4 bg-blue-600/30 ring-2 ring-blue-800 dark:ring-sky-400 rounded-sm font-montserrat'>Show all sessions</button>
+
                     <div className='flex gap-10'>
                         <div className='flex flex-col items-center'>
                             <h3>Session information</h3>
                             <TabGroup>
                                 <TabList variant='line'>
-                                    <Tab>Chords</Tab>
-                                    <Tab>Start</Tab>
-                                    <Tab>Inversions</Tab>
-                                    <Tab>Length</Tab>
-                                    <Tab>Progression length</Tab>
+                                    <Tab className='text-gray-500'>Chords</Tab>
+                                    <Tab className='text-gray-500'>Start</Tab>
+                                    <Tab className='text-gray-500'>Inversions</Tab>
+                                    <Tab className='text-gray-500'>Length</Tab>
+                                    <Tab className='text-gray-500'>Progression length</Tab>
                                 </TabList>
                                 <TabPanels>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{chordNames.map((chord) => `${chord['roman']}, `)}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{chordNames.map((chord) => `${chord['roman']}, `)}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.start}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{progressionSession?.start}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.inversions.map((inversion, index) => `${inversion}${(progressionSession?.inversions.length > index + 1) ? ', ' : ''}`)}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{progressionSession?.inversions.map((inversion, index) => `${inversion}${(progressionSession?.inversions.length > index + 1) ? ', ' : ''}`)}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.length}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{progressionSession?.length}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{progressionSession?.progression_length}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{progressionSession?.progression_length}</p>
                                     </TabPanel>
                                 </TabPanels>
                             </TabGroup>
@@ -495,7 +498,9 @@ const ProgressionProgress = (props) => {
             
         </div>
         }
-        
+        {showAll &&
+            <FullProgress type='progression' levelStats={progressionSession?.progressInfo.levelStats} current={progressionSession?.level} close={() => setShowAll(false)}/>
+        }
     </div>
   )
 }

@@ -320,23 +320,23 @@ const IntervalProgress = (props) => {
                             <h3>Session information</h3>
                             <TabGroup>
                                 <TabList variant='line'>
-                                    <Tab value={1}>Intervals</Tab>
-                                    <Tab value={2}>Directions</Tab>
-                                    <Tab value={3}>Octaves</Tab>
-                                    <Tab value={4}>Length</Tab>
+                                    <Tab className=' text-gray-500' value={1}>Intervals</Tab>
+                                    <Tab className=' text-gray-500' value={2}>Directions</Tab>
+                                    <Tab className=' text-gray-500' value={3}>Octaves</Tab>
+                                    <Tab className=' text-gray-500' value={4}>Length</Tab>
                                 </TabList>
                                 <TabPanels>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalNames.map((name) => `${name}, `)}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{intervalNames.map((name) => `${name}, `)}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalSession?.directions.map((direction) => `${direction}, `)}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{intervalSession?.directions.map((direction) => `${direction}, `)}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalSession?.width}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{intervalSession?.width}</p>
                                     </TabPanel>
                                     <TabPanel>
-                                        <p className='mt-4 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{intervalSession?.length}</p>
+                                        <p className='mt-4 leading-6 text-tremor-default text-gray-500 dark:text-dark-tremor-content'>{intervalSession?.length}</p>
                                     </TabPanel>
                                 </TabPanels>
                             </TabGroup>
@@ -409,7 +409,7 @@ const IntervalProgress = (props) => {
         }
 
         {showAll &&
-            <FullProgress levelStats={intervalSession?.progressInfo.levelStats} current={intervalSession?.level} close={() => setShowAll(false)}/>
+            <FullProgress type='interval' levelStats={intervalSession?.progressInfo.levelStats} current={intervalSession?.level} close={() => setShowAll(false)}/>
         }
         
     </div>

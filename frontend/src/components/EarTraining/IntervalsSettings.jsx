@@ -19,6 +19,7 @@ const IntervalsSettings = (props) => {
         'Up': true,
         'Down': false,
         'Unison': false,
+        'Random': false,
     })
     const [clickedScope, setClickedScope] = useState(0)
     const [clickedLength, setClickedLength] = useState('10')
@@ -40,10 +41,21 @@ const IntervalsSettings = (props) => {
     }
 
     const handleDirectionClick = (dir, bool) => {
-        setClickedDirections({
+        if ((dir === 'Random') && (!bool)) {
+            setClickedDirections({
+                'Up': false,
+                'Down': false,
+                'Unison': false,
+                'Random': true,
+            })
+        } else {
+            setClickedDirections({
             ...clickedDirections,
-            [dir]: !bool
+            [dir]: !bool,
+            'Random': false,
         })
+        }
+        
     }
 
     const handleScopeClick = (index) => {
